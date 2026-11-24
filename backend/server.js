@@ -73,12 +73,11 @@ connectMongoAtlas()
     if (res.ok) {
       console.log(`🍃 Connected to MongoDB Atlas (${res.status.uriMasked} -> ${res.status.dbName})`);
       const counts = res.status.collectionCounts || {};
-      if (Number(counts.members || 0) > 0) {
-        // Hydrate server state from MongoDB Atlas cloud collections on startup (ideal for Render/Railway/Cloud deploys)
+      if ((counts.members || 0) > 0) {
         const pulled = await pullFromMongoAtlas(initialDb);
-        if (pulled.ok && pulled.dbData) {
+        if (pulled.ok) {
           saveDatabase(pulled.dbData);
-          console.log(`☁️  Hydrated local state from MongoDB Atlas (${pulled.dbData.Members.length} members, ${pulled.dbData.Payments.length} payments)`);
+          console.log(`🍃 Hydrated local state from MongoDB Atlas (${counts.members} members)`);
           return;
         }
       }
@@ -1068,8 +1067,6 @@ const MIME_TYPES = {
   '.csv': 'text/csv; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
 };
 
 function sendJSON(res, statusCode, data) {
@@ -1091,8 +1088,8 @@ function readRawBody(req) {
   });
 }
 
-function createServer() {
-  return http.createServer(async (req, res) => {
+function createRequestHandler() {
+  return async (req, res) => {
     if (req.method === 'OPTIONS') {
       res.writeHead(204, {
         'Access-Control-Allow-Origin': '*',
@@ -1104,6 +1101,11 @@ function createServer() {
 
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const pathname = parsedUrl.pathname;
+
+    // Health check endpoint for Render
+    if (req.method === 'GET' && pathname === '/api/health') {
+      return sendJSON(res, 200, { ok: true, status: 'healthy', todayIST: getTodayIST() });
+    }
 
     try {
       // 1. GET full database state + live KPIs
@@ -1508,8 +1510,14 @@ function createServer() {
     } catch (err) {
       return sendJSON(res, 500, { ok: false, error: err.message });
     }
-  });
+  };
 }
+
+function createServer() {
+  return http.createServer(createRequestHandler());
+}
+
+const requestHandler = createRequestHandler();
 
 if (require.main === module) {
   const server = createServer();
@@ -1524,12 +1532,14 @@ if (require.main === module) {
   });
 }
 
-module.exports = {
+// Export requestHandler as default function for Vercel Serverless, plus named exports
+module.exports = Object.assign(requestHandler, {
   createServer,
+  requestHandler,
   executeWorkflow1Registration,
   executeWorkflow2ExpiryReminders,
   executeWorkflow3PaymentProcessing,
   executeWorkflow4DailyReport,
   generateRazorpayPaymentLink,
   DEFAULT_WEBHOOK_SECRET,
-};
+});

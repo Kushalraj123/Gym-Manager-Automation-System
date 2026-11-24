@@ -10,6 +10,16 @@ let activeInspectorSheet = 'Members';
 let lastGeneratedWebhookSim = null;
 let currentPortalSession = null; // Starts unauthenticated on the dedicated Login Page
 
+// Support split Frontend (Vercel) + Backend (Render) deployments or unified same-origin deployment
+const API_BASE_URL = (window.GYM_API_BASE_URL || localStorage.getItem('GYM_API_BASE_URL') || '').replace(/\/$/, '');
+const originalFetch = window.fetch.bind(window);
+window.fetch = (url, options) => {
+  if (typeof url === 'string' && url.startsWith('/api/') && API_BASE_URL) {
+    return originalFetch(`${API_BASE_URL}${url}`, options);
+  }
+  return originalFetch(url, options);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupForms();
@@ -1148,9 +1158,8 @@ function renderMemberPortal() {
   setElText('memWorkoutPlan', profile.Workout_Plan);
   setElText('memDietNotes', profile.Diet_Notes);
 
-  // Member Self-Service Renewal Plan & Payment Method Selector (1M / 3M / 6M / 1Y + Online / Cash)
+  // Member Self-Service Renewal Plan Selector (1M / 3M / 6M / 1Y)
   const memPlanSelect = document.getElementById('memRenewPlanSelect');
-  const memMethodSelect = document.getElementById('memRenewMethodSelect');
   const renewBtn = document.getElementById('memInstantRenewBtn');
   const renewPreview = document.getElementById('memRenewExpiryPreview');
   const settings = (appState.sheets.Gym_Settings && appState.sheets.Gym_Settings[0]) || {};
@@ -1167,75 +1176,120 @@ function renderMemberPortal() {
     const opt = memPlanSelect.options[memPlanSelect.selectedIndex];
     const months = Number(opt.getAttribute('data-months') || 1);
     const price = getPlanPriceForMonths(months);
-    const method = memMethodSelect ? memMethodSelect.value : 'Online';
     const baseDate = daysLeft >= 0 ? member.Expiry_Date : appState.todayIST;
     const projectedExpiry = addMonthsClampedClient(baseDate, months);
 
-    const qrBox = document.getElementById('memOnlineQrBox');
-    const qrAmountBadge = document.getElementById('memQrAmountBadge');
-    if (qrBox) {
-      qrBox.classList.toggle('hidden', method !== 'Online');
-    }
-    if (qrAmountBadge) {
-      qrAmountBadge.textContent = `₹${price.toLocaleString('en-IN')}`;
-    }
-
     if (renewBtn) {
-      const icon = method === 'Cash' ? '💵' : '💳';
-      renewBtn.textContent = `${icon} Renew ${opt.value} Plan (${method} Payment) — ₹${price.toLocaleString('en-IN')}`;
+      renewBtn.textContent = `⚡ Renew ${opt.value} Plan — ₹${price.toLocaleString('en-IN')}`;
     }
     if (renewPreview) {
-      renewPreview.innerHTML = `Mode: <strong>${method === 'Cash' ? 'Cash at Gym Desk' : 'Online Razorpay / UPI'}</strong> • Extending by <strong>${months} month${months > 1 ? 's' : ''}</strong> from <code>${baseDate}</code> &rarr; New Expiry Date: <strong style="color:#34d399;">${projectedExpiry}</strong>`;
+      renewPreview.innerHTML = ` Extending by <strong>${months} month${months > 1 ? 's' : ''}</strong> from <code>${baseDate}</code> &rarr; New Expiry Date: <strong style="color:#34d399;">${projectedExpiry}</strong>`;
+    }
+    const qrTitle = document.getElementById('memQrPlanTitle');
+    if (qrTitle) {
+      qrTitle.textContent = `${opt.value} Plan (${months} Month${months > 1 ? 's' : ''}) — ₹${price.toLocaleString('en-IN')}`;
+    }
+    const qrSub = document.getElementById('memQrMemberSubtitle');
+    if (qrSub) {
+      qrSub.textContent = `Member: ${member.Name} (${member.Member_ID}) • Current Expiry: ${member.Expiry_Date}`;
+    }
+    const qrNote = document.getElementById('memQrExpiryNote');
+    if (qrNote) {
+      qrNote.innerHTML = `Amount to Pay: <strong style="color:#34d399;">₹${price.toLocaleString('en-IN')}</strong> • Extending Expiry to <strong style="color:#38bdf8;">${projectedExpiry}</strong>`;
     }
   };
 
   if (memPlanSelect) {
     memPlanSelect.onchange = updateMemberRenewalPreview;
+    updateMemberRenewalPreview();
   }
-  if (memMethodSelect) {
-    memMethodSelect.onchange = updateMemberRenewalPreview;
-  }
-  updateMemberRenewalPreview();
+
+  const methodPanel = document.getElementById('memPaymentMethodPanel');
+  const memberPortalView = document.getElementById('memberPortalView');
+  const qrPage = document.getElementById('memberOnlineQrPage');
+  const chooseOnlineBtn = document.getElementById('memChooseOnlineBtn');
+  const chooseCashBtn = document.getElementById('memChooseCashBtn');
+  const confirmQrPaidBtn = document.getElementById('memConfirmQrPaidBtn');
+  const qrBackBtn = document.getElementById('memQrBackBtn');
+  const qrCancelBtn = document.getElementById('memQrCancelBtn');
+
+  const closeQrPageAndReturnToPortal = () => {
+    if (qrPage) qrPage.classList.add('hidden');
+    if (memberPortalView) memberPortalView.classList.remove('hidden');
+  };
+
+  if (qrBackBtn) qrBackBtn.onclick = closeQrPageAndReturnToPortal;
+  if (qrCancelBtn) qrCancelBtn.onclick = closeQrPageAndReturnToPortal;
 
   if (renewBtn) {
-    renewBtn.onclick = async () => {
+    renewBtn.onclick = () => {
+      if (methodPanel) {
+        methodPanel.classList.remove('hidden');
+      }
+      updateMemberRenewalPreview();
+    };
+  }
+
+  if (chooseOnlineBtn) {
+    chooseOnlineBtn.onclick = () => {
+      updateMemberRenewalPreview();
+      // Navigate to the dedicated Online QR Payment Checkout Page
+      if (memberPortalView) memberPortalView.classList.add('hidden');
+      if (qrPage) qrPage.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
+
+  if (confirmQrPaidBtn) {
+    confirmQrPaidBtn.onclick = async () => {
       const opt = memPlanSelect.options[memPlanSelect.selectedIndex];
       const selectedPlan = opt.value;
       const selectedMonths = Number(opt.getAttribute('data-months') || 1);
       const selectedAmount = getPlanPriceForMonths(selectedMonths);
-      const selectedMethod = memMethodSelect ? memMethodSelect.value : 'Online';
 
-      if (selectedMethod === 'Cash') {
-        const cashRef = `CASH-MEM-${member.Member_ID}-${Date.now().toString().slice(-6)}`;
-        const res = await fetch('/api/workflows/3/manual-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            memberId: member.Member_ID,
-            plan: selectedPlan,
-            durationMonths: selectedMonths,
-            amount: selectedAmount,
-            paymentMethod: 'Cash',
-            paymentReference: cashRef,
-          }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          showToast(
-            `Cash Renewal Recorded! ₹${selectedAmount} (${selectedPlan}) • Ref: ${cashRef} • New Expiry: ${data.newExpiryDate}`,
-            'success'
-          );
-          await fetchAppState();
-        } else {
-          showToast(`Renewal Error: ${data.error}`, 'error');
-        }
+      document.getElementById('payMemberSelect').value = member.Member_ID;
+      document.getElementById('payPlanSelect').value = selectedPlan;
+      document.getElementById('payAmountInput').value = selectedAmount;
+      closeQrPageAndReturnToPortal();
+      if (methodPanel) methodPanel.classList.add('hidden');
+      await generateAndFireRazorpayWebhook(true);
+    };
+  }
+
+  if (chooseCashBtn) {
+    chooseCashBtn.onclick = async () => {
+      const opt = memPlanSelect.options[memPlanSelect.selectedIndex];
+      const selectedPlan = opt.value;
+      const selectedMonths = Number(opt.getAttribute('data-months') || 1);
+      const selectedAmount = getPlanPriceForMonths(selectedMonths);
+
+      const payload = {
+        memberId: member.Member_ID,
+        plan: selectedPlan,
+        durationMonths: selectedMonths,
+        amount: selectedAmount,
+        paymentMethod: 'Cash',
+        paymentReference: `CASH-MEM-${member.Member_ID}-${Date.now().toString().slice(-6)}`,
+      };
+
+      const res = await fetch('/api/workflows/3/manual-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (qrPanel) qrPanel.classList.add('hidden');
+      if (methodPanel) methodPanel.classList.add('hidden');
+
+      if (data.ok) {
+        showToast(
+          `Cash Renewal Recorded (₹${selectedAmount.toLocaleString('en-IN')})! Membership extended to ${data.newExpiryDate}`,
+          'success'
+        );
       } else {
-        // Online Payment -> Sync with Workflow 3 form controls and fire signed Razorpay Webhook
-        document.getElementById('payMemberSelect').value = member.Member_ID;
-        document.getElementById('payPlanSelect').value = selectedPlan;
-        document.getElementById('payAmountInput').value = selectedAmount;
-        await generateAndFireRazorpayWebhook(true);
+        showToast(`Payment Error: ${data.error}`, 'error');
       }
+      await fetchAppState();
     };
   }
 

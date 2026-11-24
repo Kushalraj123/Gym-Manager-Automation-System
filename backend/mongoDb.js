@@ -85,6 +85,9 @@ function maskMongoUri(uri) {
 }
 
 function loadSavedMongoConfig() {
+  if (inMemoryMongoUri) {
+    return { uri: inMemoryMongoUri, dbName: inMemoryMongoDbName };
+  }
   const envFileVars = readDotEnvVariables();
   const envUri = process.env.MONGODB_URI || envFileVars.MONGODB_URI || '';
   const envDbName = process.env.MONGODB_DB_NAME || envFileVars.MONGODB_DB_NAME || 'gym_manager_saas';
@@ -105,14 +108,21 @@ function loadSavedMongoConfig() {
   return { uri: '', dbName: 'gym_manager_saas' };
 }
 
+let inMemoryMongoUri = '';
+let inMemoryMongoDbName = 'gym_manager_saas';
+
 function saveMongoConfig(uri, dbName = 'gym_manager_saas') {
-  const dir = path.dirname(MONGO_CONFIG_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(
-    MONGO_CONFIG_PATH,
-    JSON.stringify({ uri: uri || '', dbName: dbName || 'gym_manager_saas' }, null, 2),
-    'utf8'
-  );
+  inMemoryMongoUri = uri || '';
+  inMemoryMongoDbName = dbName || 'gym_manager_saas';
+  try {
+    const dir = path.dirname(MONGO_CONFIG_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      MONGO_CONFIG_PATH,
+      JSON.stringify({ uri: uri || '', dbName: dbName || 'gym_manager_saas' }, null, 2),
+      'utf8'
+    );
+  } catch (_) {}
 }
 
 /**

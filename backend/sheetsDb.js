@@ -378,21 +378,32 @@ function toCSV(headers, rows) {
   return [headerLine, ...dataLines].join('\n') + '\n';
 }
 
+// In-memory cache so serverless/read-only environments (like Vercel) remain fast & functional alongside MongoDB Atlas
+let inMemoryDbCache = null;
+
 function syncCSVFiles(dbData) {
-  if (!fs.existsSync(SHEETS_CSV_DIR)) {
-    fs.mkdirSync(SHEETS_CSV_DIR, { recursive: true });
-  }
-  for (const [sheetName, headers] of Object.entries(SHEET_SCHEMAS)) {
-    const rows = dbData[sheetName] || [];
-    const csvContent = toCSV(headers, rows);
-    fs.writeFileSync(path.join(SHEETS_CSV_DIR, `${sheetName}.csv`), csvContent, 'utf8');
-  }
+  try {
+    if (!fs.existsSync(SHEETS_CSV_DIR)) {
+      fs.mkdirSync(SHEETS_CSV_DIR, { recursive: true });
+    }
+    for (const [sheetName, headers] of Object.entries(SHEET_SCHEMAS)) {
+      const rows = dbData[sheetName] || [];
+      const csvContent = toCSV(headers, rows);
+      fs.writeFileSync(path.join(SHEETS_CSV_DIR, `${sheetName}.csv`), csvContent, 'utf8');
+    }
+  } catch (_) {}
 }
 
 function loadDatabase() {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+  if (inMemoryDbCache) {
+    return inMemoryDbCache;
   }
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+  } catch (_) {}
+
   if (!fs.existsSync(DB_JSON_PATH)) {
     const initial = buildInitialSeedData();
     saveDatabase(initial);
@@ -419,6 +430,7 @@ function loadDatabase() {
       parsed.Gym_Settings[0].Yearly_Plan_Price = 9000;
       needsSave = true;
     }
+    inMemoryDbCache = parsed;
     if (needsSave) saveDatabase(parsed);
     return parsed;
   } catch (e) {
@@ -429,9 +441,6 @@ function loadDatabase() {
 }
 
 function saveDatabase(dbData) {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
   // Automatically refresh Member_Status based on Expiry_Date relative to today IST
   const today = getTodayIST();
   if (Array.isArray(dbData.Members)) {
@@ -445,8 +454,14 @@ function saveDatabase(dbData) {
       }
     }
   }
-  fs.writeFileSync(DB_JSON_PATH, JSON.stringify(dbData, null, 2), 'utf8');
-  syncCSVFiles(dbData);
+  inMemoryDbCache = dbData;
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_JSON_PATH, JSON.stringify(dbData, null, 2), 'utf8');
+    syncCSVFiles(dbData);
+  } catch (_) {}
   // Automatically mirror every database write to MongoDB Atlas in the background if connected
   syncLocalToMongoAtlas(dbData).catch(() => {});
   return dbData;
