@@ -1148,11 +1148,87 @@ function renderMemberPortal() {
   setElText('memWorkoutPlan', profile.Workout_Plan);
   setElText('memDietNotes', profile.Diet_Notes);
 
+  // Member Self-Service Renewal Plan & Payment Method Selector (1M / 3M / 6M / 1Y + Online / Cash)
+  const memPlanSelect = document.getElementById('memRenewPlanSelect');
+  const memMethodSelect = document.getElementById('memRenewMethodSelect');
   const renewBtn = document.getElementById('memInstantRenewBtn');
-  renewBtn.onclick = async () => {
-    document.getElementById('payMemberSelect').value = member.Member_ID;
-    await generateAndFireRazorpayWebhook(true);
+  const renewPreview = document.getElementById('memRenewExpiryPreview');
+  const settings = (appState.sheets.Gym_Settings && appState.sheets.Gym_Settings[0]) || {};
+
+  const getPlanPriceForMonths = (months) => {
+    if (months === 12) return Number(settings.Yearly_Plan_Price || 9000);
+    if (months === 6) return Number(settings.Half_Yearly_Plan_Price || 6000);
+    if (months === 3) return Number(settings.Quarterly_Plan_Price || 4000);
+    return Number(settings.Monthly_Plan_Price || 2000);
   };
+
+  const updateMemberRenewalPreview = () => {
+    if (!memPlanSelect) return;
+    const opt = memPlanSelect.options[memPlanSelect.selectedIndex];
+    const months = Number(opt.getAttribute('data-months') || 1);
+    const price = getPlanPriceForMonths(months);
+    const method = memMethodSelect ? memMethodSelect.value : 'Online';
+    const baseDate = daysLeft >= 0 ? member.Expiry_Date : appState.todayIST;
+    const projectedExpiry = addMonthsClampedClient(baseDate, months);
+
+    if (renewBtn) {
+      const icon = method === 'Cash' ? '💵' : '💳';
+      renewBtn.textContent = `${icon} Renew ${opt.value} Plan (${method} Payment) — ₹${price.toLocaleString('en-IN')}`;
+    }
+    if (renewPreview) {
+      renewPreview.innerHTML = `Mode: <strong>${method === 'Cash' ? 'Cash at Gym Desk' : 'Online Razorpay / UPI'}</strong> • Extending by <strong>${months} month${months > 1 ? 's' : ''}</strong> from <code>${baseDate}</code> &rarr; New Expiry Date: <strong style="color:#34d399;">${projectedExpiry}</strong>`;
+    }
+  };
+
+  if (memPlanSelect) {
+    memPlanSelect.onchange = updateMemberRenewalPreview;
+  }
+  if (memMethodSelect) {
+    memMethodSelect.onchange = updateMemberRenewalPreview;
+  }
+  updateMemberRenewalPreview();
+
+  if (renewBtn) {
+    renewBtn.onclick = async () => {
+      const opt = memPlanSelect.options[memPlanSelect.selectedIndex];
+      const selectedPlan = opt.value;
+      const selectedMonths = Number(opt.getAttribute('data-months') || 1);
+      const selectedAmount = getPlanPriceForMonths(selectedMonths);
+      const selectedMethod = memMethodSelect ? memMethodSelect.value : 'Online';
+
+      if (selectedMethod === 'Cash') {
+        const cashRef = `CASH-MEM-${member.Member_ID}-${Date.now().toString().slice(-6)}`;
+        const res = await fetch('/api/workflows/3/manual-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            memberId: member.Member_ID,
+            plan: selectedPlan,
+            durationMonths: selectedMonths,
+            amount: selectedAmount,
+            paymentMethod: 'Cash',
+            paymentReference: cashRef,
+          }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(
+            `Cash Renewal Recorded! ₹${selectedAmount} (${selectedPlan}) • Ref: ${cashRef} • New Expiry: ${data.newExpiryDate}`,
+            'success'
+          );
+          await fetchAppState();
+        } else {
+          showToast(`Renewal Error: ${data.error}`, 'error');
+        }
+      } else {
+        // Online Payment -> Sync with Workflow 3 form controls and fire signed Razorpay Webhook
+        document.getElementById('payMemberSelect').value = member.Member_ID;
+        document.getElementById('payPlanSelect').value = selectedPlan;
+        document.getElementById('payAmountInput').value = selectedAmount;
+        await generateAndFireRazorpayWebhook(true);
+      }
+    };
+  }
 
   // Populate Member's personal payment receipts
   const myPayments = (appState.sheets.Payments || []).filter((p) => p.Member_ID === member.Member_ID).reverse();

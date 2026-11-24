@@ -69,9 +69,19 @@ const DEFAULT_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'gym_rzp_w
 // Ensure database is initialized on boot and auto-connect to MongoDB Atlas if configured
 const initialDb = loadDatabase();
 connectMongoAtlas()
-  .then((res) => {
+  .then(async (res) => {
     if (res.ok) {
       console.log(`🍃 Connected to MongoDB Atlas (${res.status.uriMasked} -> ${res.status.dbName})`);
+      const counts = res.status.collectionCounts || {};
+      if (Number(counts.members || 0) > 0) {
+        // Hydrate server state from MongoDB Atlas cloud collections on startup (ideal for Render/Railway/Cloud deploys)
+        const pulled = await pullFromMongoAtlas(initialDb);
+        if (pulled.ok && pulled.dbData) {
+          saveDatabase(pulled.dbData);
+          console.log(`☁️  Hydrated local state from MongoDB Atlas (${pulled.dbData.Members.length} members, ${pulled.dbData.Payments.length} payments)`);
+          return;
+        }
+      }
       return syncLocalToMongoAtlas(initialDb);
     }
   })

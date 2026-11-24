@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: gym-manager-automation-system
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Kolkata
+      - key: MONGODB_DB_NAME
+        value: gym_manager_saas
+      - key: MONGODB_URI
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        value: gym_rzp_whsec_9f8e7d6c5b4a3f2e1d0c

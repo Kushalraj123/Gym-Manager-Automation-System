@@ -19,7 +19,7 @@
       "Email": "aarav.sharma@example.in",
       "Plan": "Monthly",
       "Joining_Date": "2026-11-09",
-      "Expiry_Date": "2027-04-07",
+      "Expiry_Date": "2027-09-07",
       "Payment_Status": "Paid",
       "Payment_Method": "Razorpay",
       "WhatsApp_Consent": "TRUE",
@@ -215,6 +215,36 @@
       "Payment_Date": "2026-11-24",
       "Razorpay_Reference": "pay_Rzp51164248ba",
       "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5010",
+      "Member_ID": "GYM-1001",
+      "Amount": 4000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_Rzp55407208b4",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5011",
+      "Member_ID": "GYM-1001",
+      "Amount": 2000,
+      "Payment_Method": "Cash",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "CASH-MEM-GYM-1001-864584",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5012",
+      "Member_ID": "GYM-1001",
+      "Amount": 2000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_Rzp5867882e54",
+      "Webhook_Processed": "TRUE"
     }
   ],
   "Reminder_Logs": [
@@ -329,6 +359,219 @@
     }
   },
   "Execution_Audit_Logs": [
+    {
+      "executionId": "EXEC-1795525867893-416",
+      "timestamp": "2026-11-24 18:41:07",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹2000 (Razorpay | Ref: pay_Rzp5867882e54) processed for Aarav Sharma (GYM-1001). Expiry extended: 2027-08-07 -> 2027-09-07.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:41:07"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp5867882e54",
+            "amountInRupees": 2000,
+            "memberId": "GYM-1001"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "pay_Rzp5867882e54"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1001",
+            "previousExpiryDate": "2027-08-07",
+            "newExpiryDate": "2027-09-07",
+            "paymentRow": {
+              "Payment_ID": "PAY-5012",
+              "Member_ID": "GYM-1001",
+              "Amount": 2000,
+              "Payment_Method": "Razorpay",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "pay_Rzp5867882e54",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543210",
+            "messageId": "wamid.HBgM919876543210PAY1795525867893",
+            "previewText": "Hello Aarav Sharma, we have received your payment of ₹2000 via Razorpay (Ref: pay_Rzp5867882e54). Your gym membership (GYM-1001) is now active until 2027-09-07. Thank you!"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795525864598-244",
+      "timestamp": "2026-11-24 18:41:04",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹2000 (Cash | Ref: CASH-MEM-GYM-1001-864584) processed for Aarav Sharma (GYM-1001). Expiry extended: 2027-07-07 -> 2027-08-07.",
+      "nodeTrace": [
+        {
+          "node": "1. Manual Payment Form Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "MANUAL_FORM",
+            "receivedAt": "2026-11-24 18:41:04"
+          }
+        },
+        {
+          "node": "2. Validate Manual Payment Input (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "memberId": "GYM-1001",
+            "paymentMethod": "Cash",
+            "paymentReference": "CASH-MEM-GYM-1001-864584",
+            "amountInRupees": 2000,
+            "durationMonths": 1
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "CASH-MEM-GYM-1001-864584"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1001",
+            "previousExpiryDate": "2027-07-07",
+            "newExpiryDate": "2027-08-07",
+            "paymentRow": {
+              "Payment_ID": "PAY-5011",
+              "Member_ID": "GYM-1001",
+              "Amount": 2000,
+              "Payment_Method": "Cash",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "CASH-MEM-GYM-1001-864584",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543210",
+            "messageId": "wamid.HBgM919876543210PAY1795525864597",
+            "previewText": "Hello Aarav Sharma, we have received your payment of ₹2000 via Cash (Ref: CASH-MEM-GYM-1001-864584). Your gym membership (GYM-1001) is now active until 2027-08-07. Thank you!"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795525540734-828",
+      "timestamp": "2026-11-24 18:35:40",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹4000 (Razorpay | Ref: pay_Rzp55407208b4) processed for Aarav Sharma (GYM-1001). Expiry extended: 2027-04-07 -> 2027-07-07.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:35:40"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp55407208b4",
+            "amountInRupees": 4000,
+            "memberId": "GYM-1001"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "pay_Rzp55407208b4"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1001",
+            "previousExpiryDate": "2027-04-07",
+            "newExpiryDate": "2027-07-07",
+            "paymentRow": {
+              "Payment_ID": "PAY-5010",
+              "Member_ID": "GYM-1001",
+              "Amount": 4000,
+              "Payment_Method": "Razorpay",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "pay_Rzp55407208b4",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543210",
+            "messageId": "wamid.HBgM919876543210PAY1795525540734",
+            "previewText": "Hello Aarav Sharma, we have received your payment of ₹4000 via Razorpay (Ref: pay_Rzp55407208b4). Your gym membership (GYM-1001) is now active until 2027-07-07. Thank you!"
+          }
+        }
+      ]
+    },
     {
       "executionId": "EXEC-1795525116436-852",
       "timestamp": "2026-11-24 18:28:36",

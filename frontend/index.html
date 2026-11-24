@@ -1175,10 +1175,41 @@
               <div class="card-header">
                 <div>
                   <h3>💳 My Payment Receipts &amp; Instant Renewal</h3>
-                  <p class="text-muted">Pay online via Razorpay Webhook or check past receipts</p>
+                  <p class="text-muted">Choose your renewal duration below and pay online via Razorpay Webhook</p>
                 </div>
-                <button class="btn btn-primary btn-sm" id="memInstantRenewBtn">⚡ Instant Online Renewal</button>
               </div>
+
+              <!-- Member Self-Service Plan Selector & Instant Renewal Box -->
+              <div class="pricing-tier" style="margin-bottom:16px;border-color:rgba(59,130,246,0.35);background:rgba(59,130,246,0.04);">
+                <div class="tier-badge" style="color:#38bdf8;margin-bottom:8px;">Select Membership Renewal Plan &amp; Payment Method</div>
+                <div class="form-grid" style="align-items:end;gap:12px;">
+                  <div class="form-group">
+                    <label>Choose Renewal Plan</label>
+                    <select id="memRenewPlanSelect">
+                      <option value="Monthly" data-months="1" data-price="2000">1 Month — Monthly Plan (₹2,000)</option>
+                      <option value="Quarterly" data-months="3" data-price="4000">3 Months — Quarterly Plan (₹4,000)</option>
+                      <option value="Half-Yearly" data-months="6" data-price="6000">6 Months — Half-Yearly Plan (₹6,000)</option>
+                      <option value="Yearly" data-months="12" data-price="9000">1 Year — Yearly Plan (₹9,000)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Payment Method (Online / Cash)</label>
+                    <select id="memRenewMethodSelect">
+                      <option value="Online">💳 Online Payment (Razorpay / UPI)</option>
+                      <option value="Cash">💵 Cash Payment (At Gym Desk)</option>
+                    </select>
+                  </div>
+                  <div class="form-group full-width">
+                    <button type="button" class="btn btn-primary" id="memInstantRenewBtn" style="width:100%;padding:11px 14px;">
+                      ⚡ Renew Monthly Plan (Online) — ₹2,000
+                    </button>
+                  </div>
+                </div>
+                <div id="memRenewExpiryPreview" class="text-muted" style="font-size:12px;margin-top:8px;color:#93c5fd;">
+                  New Expiry Date after renewal: --
+                </div>
+              </div>
+
               <div class="table-responsive">
                 <table class="data-table">
                   <thead>
