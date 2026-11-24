@@ -566,10 +566,18 @@
               </div>
               <div class="form-group">
                 <label>Payment Method *</label>
-                <select id="payMethodSelect">
-                  <option value="UPI">UPI (GPay / PhonePe)</option>
+                <select id="payMethodSelect" onchange="document.getElementById('ownerPayQrBox').classList.toggle('hidden', this.value !== 'UPI')">
+                  <option value="UPI">UPI (PhonePe QR / GPay)</option>
                   <option value="Cash">Cash</option>
                 </select>
+              </div>
+              <div id="ownerPayQrBox" class="full-width" style="background:#0b1120;border:1px solid rgba(16,185,129,0.4);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:11.5px;font-weight:700;color:#a7f3d0;text-transform:uppercase;margin-bottom:6px;">
+                  📱 PhonePe UPI QR Code — Kushal Raj M
+                </div>
+                <div style="display:inline-block;background:#ffffff;padding:6px;border-radius:10px;">
+                  <img src="/phonepe-qr.jpg" alt="PhonePe QR Code" style="width:170px;height:auto;display:block;border-radius:6px;" />
+                </div>
               </div>
               <div class="form-group full-width">
                 <label>Unique Payment Reference / UPI UTR / Receipt No. *</label>
@@ -1195,13 +1203,30 @@
                   <div class="form-group">
                     <label>Payment Method (Online / Cash)</label>
                     <select id="memRenewMethodSelect">
-                      <option value="Online">💳 Online Payment (Razorpay / UPI)</option>
+                      <option value="Online">💳 Online Payment (PhonePe QR / UPI)</option>
                       <option value="Cash">💵 Cash Payment (At Gym Desk)</option>
                     </select>
                   </div>
+
+                  <!-- PhonePe QR Code Display Box for Online Payment -->
+                  <div id="memOnlineQrBox" class="full-width" style="background:#0b1120;border:1px solid rgba(16,185,129,0.4);border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:12px;font-weight:700;color:#a7f3d0;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">
+                      📱 Scan &amp; Pay via PhonePe / UPI QR Code
+                    </div>
+                    <div style="display:inline-block;background:#ffffff;padding:8px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.45);">
+                      <img src="/phonepe-qr.jpg" alt="PhonePe UPI QR Code — Kushal Raj M" style="width:220px;max-width:100%;height:auto;display:block;border-radius:8px;" />
+                    </div>
+                    <div style="font-size:12.5px;color:#f8fafc;font-weight:600;margin-top:8px;">
+                      Merchant: <span style="color:#34d399;">Kushal Raj M</span> • Amount to Scan: <strong id="memQrAmountBadge" style="color:#fbbf24;">₹2,000</strong>
+                    </div>
+                    <div class="text-muted" style="font-size:11.5px;margin-top:3px;">
+                      Scan with PhonePe, GPay, or Paytm, then click the button below to confirm &amp; extend your membership
+                    </div>
+                  </div>
+
                   <div class="form-group full-width">
                     <button type="button" class="btn btn-primary" id="memInstantRenewBtn" style="width:100%;padding:11px 14px;">
-                      ⚡ Renew Monthly Plan (Online) — ₹2,000
+                      💳 Renew Monthly Plan (Online Payment) — ₹2,000
                     </button>
                   </div>
                 </div>

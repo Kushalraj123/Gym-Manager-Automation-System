@@ -1171,6 +1171,15 @@ function renderMemberPortal() {
     const baseDate = daysLeft >= 0 ? member.Expiry_Date : appState.todayIST;
     const projectedExpiry = addMonthsClampedClient(baseDate, months);
 
+    const qrBox = document.getElementById('memOnlineQrBox');
+    const qrAmountBadge = document.getElementById('memQrAmountBadge');
+    if (qrBox) {
+      qrBox.classList.toggle('hidden', method !== 'Online');
+    }
+    if (qrAmountBadge) {
+      qrAmountBadge.textContent = `₹${price.toLocaleString('en-IN')}`;
+    }
+
     if (renewBtn) {
       const icon = method === 'Cash' ? '💵' : '💳';
       renewBtn.textContent = `${icon} Renew ${opt.value} Plan (${method} Payment) — ₹${price.toLocaleString('en-IN')}`;

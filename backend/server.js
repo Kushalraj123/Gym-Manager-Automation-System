@@ -1068,6 +1068,8 @@ const MIME_TYPES = {
   '.csv': 'text/csv; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
 };
 
 function sendJSON(res, statusCode, data) {
