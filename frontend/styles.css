@@ -925,59 +925,49 @@ body {
 @media (max-width: 768px) {
   .sidebar {
     padding: 10px 14px;
-    gap: 8px;
+    gap: 10px;
   }
 
   .sidebar-top-row {
+    gap: 10px;
+  }
+
+  .brand-row-wrap {
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-  }
-
-  /* Flatten wrappers on mobile so we can order Brand (Top-Left), User Account (Top-Right), and Badges + 3-Lines Button on the row below */
-  .brand-row-wrap,
-  .sidebar-footer {
-    display: contents;
-  }
-
-  .brand {
-    order: 1;
-    gap: 8px;
-    max-width: 54%;
-  }
-
-  .brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-  }
-
-  .brand-title {
-    font-size: 13.5px;
-    line-height: 1.2;
-  }
-
-  #navUserAccountBox {
-    order: 2;
-    margin-left: auto;
-  }
-
-  #navMongoBadgeBox {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  #navIstBadgeBox {
-    order: 4;
   }
 
   .hamburger-btn {
-    order: 5;
     display: inline-flex;
-    margin-left: auto;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+  }
+
+  .brand-subtitle {
+    font-size: 11px;
+  }
+
+  .sidebar-footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .tz-badge {
@@ -985,28 +975,32 @@ body {
     padding: 4px 8px;
   }
 
+  .user-account-menu {
+    margin-left: auto;
+  }
+
   .user-account-btn {
-    padding: 4px 8px 4px 5px;
-    gap: 6px;
+    padding: 4px 9px 4px 5px;
+    gap: 7px;
   }
 
   .user-avatar {
-    width: 27px;
-    height: 27px;
-    font-size: 10.5px;
-  }
-
-  .user-btn-name {
+    width: 28px;
+    height: 28px;
     font-size: 11px;
   }
 
+  .user-btn-name {
+    font-size: 11.5px;
+  }
+
   .user-btn-role {
-    font-size: 9px;
+    font-size: 9.5px;
   }
 
   .user-dropdown-card {
     position: fixed;
-    top: 62px;
+    top: 115px;
     left: 12px;
     right: 12px;
     width: auto;

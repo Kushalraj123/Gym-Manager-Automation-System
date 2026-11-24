@@ -159,21 +159,28 @@
               <div class="brand-title" id="sidebarGymName">IronFit Pro Studio</div>
             </div>
           </div>
+
+          <!-- Three-Lines Hamburger Menu Button (Visible on Mobile for Owner Nav) -->
+          <button type="button" class="hamburger-btn" id="mobileMenuToggleBtn" onclick="toggleMobileNavMenu(event)" aria-label="Toggle Navigation Menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
         </div>
 
         <div class="sidebar-footer">
-          <div class="tz-badge" id="navMongoBadgeBox" style="cursor:pointer;" onclick="switchTab('mongodb')"
+          <div class="tz-badge" style="cursor:pointer;" onclick="switchTab('mongodb')"
             title="Click to configure MongoDB Atlas Cloud Sync">
             <span>🍃 MongoDB Atlas:</span>
             <strong id="topMongoBadge" style="color:#34d399;">Connected (gym_manager_saas)</strong>
           </div>
-          <div class="tz-badge" id="navIstBadgeBox">
+          <div class="tz-badge">
             <span>🕒 IST:</span>
             <strong id="sidebarTodayIST">--</strong>
           </div>
 
-          <!-- User Account Info & Dropdown Popover (Top Right) -->
-          <div class="user-account-menu" id="navUserAccountBox">
+          <!-- User Account Info & Dropdown Popover -->
+          <div class="user-account-menu">
             <button type="button" class="user-account-btn" id="userAccountBtn"
               onclick="toggleUserAccountDropdown(event)">
               <div class="user-avatar" id="navUserAvatar">AD</div>
@@ -218,13 +225,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Three-Lines Hamburger Menu Button (Visible on Mobile Below Account Info) -->
-          <button type="button" class="hamburger-btn" id="mobileMenuToggleBtn" onclick="toggleMobileNavMenu(event)" aria-label="Toggle Navigation Menu">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-          </button>
         </div>
       </div>
 
