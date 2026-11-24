@@ -81,6 +81,25 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-panel').forEach((panel) => {
     panel.classList.toggle('active', panel.id === `tab-${tabId}`);
   });
+  // Automatically close the mobile 3-lines hamburger menu after selecting a tab
+  const navMenu = document.getElementById('ownerNavMenu');
+  const toggleBtn = document.getElementById('mobileMenuToggleBtn');
+  if (navMenu && navMenu.classList.contains('mobile-open')) {
+    navMenu.classList.remove('mobile-open');
+    if (toggleBtn) toggleBtn.classList.remove('open');
+  }
+}
+
+function toggleMobileNavMenu(event) {
+  if (event) event.stopPropagation();
+  const navMenu = document.getElementById('ownerNavMenu');
+  const toggleBtn = document.getElementById('mobileMenuToggleBtn');
+  if (navMenu) {
+    navMenu.classList.toggle('mobile-open');
+  }
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('open');
+  }
 }
 
 function showToast(message, type = 'success') {
@@ -946,6 +965,8 @@ function renderActivePortalView() {
   if (currentPortalSession.role === 'TRAINER') {
     if (ownerNav) ownerNav.classList.add('hidden');
     if (ownerHeader) ownerHeader.classList.add('hidden');
+    const toggleBtn = document.getElementById('mobileMenuToggleBtn');
+    if (toggleBtn) toggleBtn.classList.add('hidden');
     switchTab('portal-login');
     trainerView.classList.remove('hidden');
     memberView.classList.add('hidden');
@@ -953,6 +974,8 @@ function renderActivePortalView() {
   } else if (currentPortalSession.role === 'MEMBER') {
     if (ownerNav) ownerNav.classList.add('hidden');
     if (ownerHeader) ownerHeader.classList.add('hidden');
+    const toggleBtn = document.getElementById('mobileMenuToggleBtn');
+    if (toggleBtn) toggleBtn.classList.add('hidden');
     switchTab('portal-login');
     memberView.classList.remove('hidden');
     trainerView.classList.add('hidden');
@@ -960,6 +983,8 @@ function renderActivePortalView() {
   } else {
     if (ownerNav) ownerNav.classList.remove('hidden');
     if (ownerHeader) ownerHeader.classList.remove('hidden');
+    const toggleBtn = document.getElementById('mobileMenuToggleBtn');
+    if (toggleBtn) toggleBtn.classList.remove('hidden');
     trainerView.classList.add('hidden');
     memberView.classList.add('hidden');
     switchTab('dashboard');

@@ -141,23 +141,32 @@
     <!-- Top Horizontal Navigation Bar -->
     <aside class="sidebar">
       <div class="sidebar-top-row">
-        <div class="brand">
-          <div class="brand-icon">
-            <svg viewBox="0 0 64 64" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32 4L56 17.8V46.2L32 60L8 46.2V17.8L32 4Z" stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
-                fill="rgba(15,23,42,0.35)" />
-              <rect x="11" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
-              <rect x="17" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
-              <rect x="22.5" y="29.5" width="19" height="5" rx="1.5" fill="#A7F3D0" />
-              <path d="M33.5 21L27.5 32.5H33L30.5 43L37.5 31H32L33.5 21Z" fill="#34D399" />
-              <rect x="41.5" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
-              <rect x="48.5" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
-            </svg>
+        <div class="brand-row-wrap">
+          <div class="brand">
+            <div class="brand-icon">
+              <svg viewBox="0 0 64 64" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 4L56 17.8V46.2L32 60L8 46.2V17.8L32 4Z" stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
+                  fill="rgba(15,23,42,0.35)" />
+                <rect x="11" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+                <rect x="17" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+                <rect x="22.5" y="29.5" width="19" height="5" rx="1.5" fill="#A7F3D0" />
+                <path d="M33.5 21L27.5 32.5H33L30.5 43L37.5 31H32L33.5 21Z" fill="#34D399" />
+                <rect x="41.5" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+                <rect x="48.5" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+              </svg>
+            </div>
+            <div>
+              <div class="brand-title" id="sidebarGymName">IronFit Pro Studio</div>
+              <div class="brand-subtitle">n8n + Google Sheets SaaS</div>
+            </div>
           </div>
-          <div>
-            <div class="brand-title" id="sidebarGymName">IronFit Pro Studio</div>
-            <div class="brand-subtitle">n8n + Google Sheets SaaS</div>
-          </div>
+
+          <!-- Three-Lines Hamburger Menu Button (Visible on Mobile for Owner Nav) -->
+          <button type="button" class="hamburger-btn" id="mobileMenuToggleBtn" onclick="toggleMobileNavMenu(event)" aria-label="Toggle Navigation Menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
         </div>
 
         <div class="sidebar-footer">

@@ -54,6 +54,59 @@ body {
   gap: 16px;
 }
 
+.brand-row-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover,
+.hamburger-btn.open {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.hamburger-line {
+  display: block;
+  width: 20px;
+  height: 2.2px;
+  background-color: #f8fafc;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(1) {
+  transform: translateY(7.2px) rotate(45deg);
+  background-color: #34d399;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7.2px) rotate(-45deg);
+  background-color: #34d399;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -862,6 +915,17 @@ body {
     gap: 10px;
   }
 
+  .brand-row-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .hamburger-btn {
+    display: inline-flex;
+  }
+
   .brand {
     gap: 10px;
   }
@@ -926,21 +990,28 @@ body {
     max-width: calc(100vw - 24px);
   }
 
+  /* Mobile Three-Lines Hamburger Drawer Menu */
   .nav-menu {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
     gap: 6px;
-    padding-top: 8px;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
+    padding-top: 10px;
+    padding-bottom: 6px;
+    border-top: 1px solid var(--border-color);
+    overflow-x: visible;
   }
 
-  .nav-menu::-webkit-scrollbar {
-    height: 3px;
+  .nav-menu.mobile-open {
+    display: flex;
   }
 
   .nav-btn {
-    padding: 7px 11px;
-    font-size: 12px;
-    gap: 6px;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    gap: 10px;
+    justify-content: flex-start;
   }
 
   .main-content {
