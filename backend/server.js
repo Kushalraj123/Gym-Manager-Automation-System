@@ -1081,11 +1081,43 @@ function sendJSON(res, statusCode, data) {
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
+    // Support Vercel Serverless pre-parsed req.body or raw Buffer
+    if (req.body !== undefined && req.body !== null) {
+      if (Buffer.isBuffer(req.body)) {
+        return resolve(req.body.toString('utf8'));
+      }
+      if (typeof req.body === 'string') {
+        return resolve(req.body);
+      }
+      if (typeof req.body === 'object') {
+        return resolve(JSON.stringify(req.body));
+      }
+    }
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
+}
+
+let bootHydrationPromise = null;
+function ensureCloudBootHydration() {
+  if (!bootHydrationPromise) {
+    bootHydrationPromise = connectMongoAtlas()
+      .then(async (res) => {
+        if (res.ok) {
+          const counts = res.status.collectionCounts || {};
+          if ((counts.members || 0) > 0) {
+            const pulled = await pullFromMongoAtlas(loadDatabase());
+            if (pulled.ok) {
+              saveDatabase(pulled.dbData);
+            }
+          }
+        }
+      })
+      .catch(() => {});
+  }
+  return bootHydrationPromise;
 }
 
 function createRequestHandler() {
@@ -1108,6 +1140,8 @@ function createRequestHandler() {
     }
 
     try {
+      await ensureCloudBootHydration();
+
       // 1. GET full database state + live KPIs
       if (req.method === 'GET' && pathname === '/api/state') {
         const db = loadDatabase();

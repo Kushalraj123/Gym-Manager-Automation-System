@@ -10,8 +10,18 @@ let activeInspectorSheet = 'Members';
 let lastGeneratedWebhookSim = null;
 let currentPortalSession = null; // Starts unauthenticated on the dedicated Login Page
 
-// Support split Frontend (Vercel) + Backend (Render) deployments or unified same-origin deployment
-const API_BASE_URL = (window.GYM_API_BASE_URL || localStorage.getItem('GYM_API_BASE_URL') || '').replace(/\/$/, '');
+// Support split Frontend (Vercel) + Backend (Render) deployments or unified Full-Stack Vercel / Render deployment
+let API_BASE_URL = (
+  new URLSearchParams(window.location.search).get('api') ||
+  window.GYM_API_BASE_URL ||
+  localStorage.getItem('GYM_API_BASE_URL') ||
+  ''
+).replace(/\/$/, '');
+
+if (new URLSearchParams(window.location.search).get('api')) {
+  localStorage.setItem('GYM_API_BASE_URL', API_BASE_URL);
+}
+
 const originalFetch = window.fetch.bind(window);
 window.fetch = (url, options) => {
   if (typeof url === 'string' && url.startsWith('/api/') && API_BASE_URL) {
@@ -19,6 +29,19 @@ window.fetch = (url, options) => {
   }
   return originalFetch(url, options);
 };
+
+function setExternalBackendUrl(rawUrl) {
+  const cleaned = String(rawUrl || '').trim().replace(/\/$/, '');
+  API_BASE_URL = cleaned;
+  if (cleaned) {
+    localStorage.setItem('GYM_API_BASE_URL', cleaned);
+    showToast(`Connected Frontend to external Backend: ${cleaned}`, 'success');
+  } else {
+    localStorage.removeItem('GYM_API_BASE_URL');
+    showToast('Using built-in Same-Origin Serverless Backend (/api/*)', 'success');
+  }
+  fetchAppState();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
@@ -1336,6 +1359,10 @@ function renderMongoStatusPanel(status) {
   const topBadge = document.getElementById('topMongoBadge');
   const panelBadge = document.getElementById('mongoPanelBadge');
   const dbNameInput = document.getElementById('mongoDbNameInput');
+  const extBackendInput = document.getElementById('externalBackendUrlInput');
+  if (extBackendInput && API_BASE_URL && !extBackendInput.value) {
+    extBackendInput.value = API_BASE_URL;
+  }
 
   if (dbNameInput && effectiveStatus.dbName) {
     dbNameInput.value = effectiveStatus.dbName;
