@@ -1,0 +1,192 @@
+{
+  "name": "Workflow 2 - Membership Expiry Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "wf2-node-1-schedule",
+      "name": "1. Schedule Trigger (08:00 AM IST)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "wf2-node-2-read-members",
+      "name": "2. Read Members (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node 3: Calculate Remaining Days, Filter Expiring (3d & 0d), Check Consent & Same-Day Idempotency\nconst formatter = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'Asia/Kolkata',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit'\n});\nconst todayIST = formatter.format(new Date());\nconst [y1, m1, d1] = todayIST.split('-').map(Number);\nconst utcToday = Date.UTC(y1, m1 - 1, d1);\n\nconst qualifyingMembers = [];\n\nfor (const item of $input.all()) {\n  const member = item.json;\n  if (!member.Expiry_Date || !/^\\d{4}-\\d{2}-\\d{2}$/.test(member.Expiry_Date)) continue;\n\n  // 1. Check WhatsApp Consent\n  if (String(member.WhatsApp_Consent).toUpperCase() !== 'TRUE') continue;\n\n  // 2. Prevent duplicate reminder on the same day\n  if (String(member.Last_Reminder_Date) === todayIST) continue;\n\n  // 3. Calculate Remaining Days\n  const [y2, m2, d2] = member.Expiry_Date.split('-').map(Number);\n  const utcExpiry = Date.UTC(y2, m2 - 1, d2);\n  const daysRemaining = Math.round((utcExpiry - utcToday) / (1000 * 60 * 60 * 24));\n\n  if (daysRemaining === 3 || daysRemaining === 0) {\n    const reminderType = daysRemaining === 3 ? '3DAY_EXPIRY' : 'TODAY_EXPIRY';\n    const templateName = daysRemaining === 3 ? 'gym_expiry_3day_reminder' : 'gym_expiry_today_reminder';\n    const messagePreview = daysRemaining === 3\n      ? `Hello ${member.Name}, your gym membership expires in 3 days. Please renew your membership to continue enjoying our facilities. Thank you!`\n      : `Hello ${member.Name}, your gym membership expires today. Please renew your plan to continue your fitness journey!`;\n\n    qualifyingMembers.push({\n      json: {\n        ...member,\n        Today_IST: todayIST,\n        Days_Remaining: daysRemaining,\n        Reminder_Type: reminderType,\n        Template_Name: templateName,\n        Message_Preview: messagePreview,\n        Reminder_ID: `REM-${Date.now()}-${member.Member_ID}`\n      }\n    });\n  }\n}\n\nreturn qualifyingMembers;"
+      },
+      "id": "wf2-node-3-filter-code",
+      "name": "3. Calculate Remaining Days, Check Consent & Deduplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.Phone }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"{{ $json.Template_Name }}\",\n    \"language\": { \"code\": \"en\" },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          { \"type\": \"text\", \"text\": \"{{ $json.Name }}\" }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "wf2-node-4-send-whatsapp",
+      "name": "4. Send Approved WhatsApp Template",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Reminder_Logs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder_ID": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Reminder_ID }}",
+            "Member_ID": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Member_ID }}",
+            "Phone": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Phone }}",
+            "Reminder_Type": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Reminder_Type }}",
+            "Sent_Date": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Today_IST }}",
+            "Delivery_Status": "=SENT ({{ $json.messages[0].id }})"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf2-node-5-log-reminder",
+      "name": "5. Save Reminder Log (Reminder_Logs)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Member_ID": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Member_ID }}",
+            "Last_Reminder_Date": "={{ $('3. Calculate Remaining Days, Check Consent & Deduplicate').item.json.Today_IST }}"
+          },
+          "matchingColumns": ["Member_ID"]
+        },
+        "options": {}
+      },
+      "id": "wf2-node-6-update-member",
+      "name": "6. Update Member Last_Reminder_Date",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1500, 300]
+    }
+  ],
+  "connections": {
+    "1. Schedule Trigger (08:00 AM IST)": {
+      "main": [
+        [
+          {
+            "node": "2. Read Members (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Read Members (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "3. Calculate Remaining Days, Check Consent & Deduplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Calculate Remaining Days, Check Consent & Deduplicate": {
+      "main": [
+        [
+          {
+            "node": "4. Send Approved WhatsApp Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Send Approved WhatsApp Template": {
+      "main": [
+        [
+          {
+            "node": "5. Save Reminder Log (Reminder_Logs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Save Reminder Log (Reminder_Logs)": {
+      "main": [
+        [
+          {
+            "node": "6. Update Member Last_Reminder_Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Asia/Kolkata",
+    "executionOrder": "v1"
+  }
+}

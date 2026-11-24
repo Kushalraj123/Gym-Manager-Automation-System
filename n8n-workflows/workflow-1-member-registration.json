@@ -1,0 +1,213 @@
+{
+  "name": "Workflow 1 - Gym Member Registration",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gym-register-member",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf1-node-1-webhook",
+      "name": "1. Form Trigger (Webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "gym-register-member-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node 2: Validate Input, Normalize Indian Phone & Calculate Month-End Safe Expiry Date\nconst body = $input.first().json.body || $input.first().json;\n\nconst name = String(body.name || body.Name || '').trim();\nconst email = String(body.email || body.Email || '').trim().toLowerCase();\nconst rawPhone = String(body.phone || body.Phone || '').trim();\nconst plan = String(body.plan || body.Plan || 'Monthly').trim();\nconst joiningDate = String(body.joiningDate || body.Joining_Date || '').trim();\nconst paymentStatus = String(body.paymentStatus || body.Payment_Status || 'Pending').trim();\nconst paymentMethod = String(body.paymentMethod || body.Payment_Method || 'UPI').trim();\nconst whatsappConsent = (body.whatsappConsent === true || String(body.whatsappConsent).toUpperCase() === 'TRUE') ? 'TRUE' : 'FALSE';\n\n// 1. Validate required fields\nif (!name || name.length < 2) {\n  throw new Error('Validation Error: Full Name is required (min 2 chars).');\n}\nif (!/^\\d{4}-\\d{2}-\\d{2}$/.test(joiningDate)) {\n  throw new Error('Validation Error: Joining_Date must be in YYYY-MM-DD format.');\n}\n\n// 2. Normalize Indian Phone Number to 91XXXXXXXXXX\nconst digits = rawPhone.replace(/\\D/g, '');\nlet tenDigit = digits;\nif (digits.length === 12 && digits.startsWith('91')) tenDigit = digits.slice(2);\nelse if (digits.length === 11 && digits.startsWith('0')) tenDigit = digits.slice(1);\n\nif (!/^[6-9]\\d{9}$/.test(tenDigit)) {\n  throw new Error(`Validation Error: Invalid Indian mobile number (${rawPhone}). Must be 10 digits starting with 6-9.`);\n}\nconst normalizedPhone = `91${tenDigit}`;\n\n// 3. Resolve Membership Duration in Months\nlet durationMonths = Number(body.durationMonths || 0);\nif (!durationMonths) {\n  const p = plan.toLowerCase();\n  if (p.includes('year')) durationMonths = 12;\n  else if (p.includes('quarter')) durationMonths = 3;\n  else durationMonths = 1;\n}\n\n// 4. Calculate Expiry_Date with Month-End Clamping (Jan 31 + 1 month -> Feb 28/29)\nfunction addMonthsClamped(dateStr, monthsToAdd) {\n  const [year, month, day] = dateStr.split('-').map(Number);\n  const totalMonths = (month - 1) + Number(monthsToAdd);\n  const targetYear = year + Math.floor(totalMonths / 12);\n  const targetMonthIndex = totalMonths % 12;\n  const maxDaysInTargetMonth = new Date(Date.UTC(targetYear, targetMonthIndex + 1, 0)).getUTCDate();\n  const clampedDay = Math.min(day, maxDaysInTargetMonth);\n  return `${targetYear}-${String(targetMonthIndex + 1).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;\n}\n\nconst expiryDate = addMonthsClamped(joiningDate, durationMonths);\nconst memberId = `GYM-${Date.now().toString().slice(-6)}`;\n\nreturn [{\n  json: {\n    Member_ID: memberId,\n    Name: name,\n    Phone: normalizedPhone,\n    Email: email,\n    Plan: plan,\n    Duration_Months: durationMonths,\n    Joining_Date: joiningDate,\n    Expiry_Date: expiryDate,\n    Payment_Status: paymentStatus,\n    Payment_Method: paymentMethod,\n    WhatsApp_Consent: whatsappConsent,\n    Last_Reminder_Date: '',\n    Member_Status: 'Active'\n  }\n}];"
+      },
+      "id": "wf1-node-2-validate-calculate",
+      "name": "2. Validate, Normalize Phone & Calculate Expiry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $json.Phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf1-node-3-lookup-duplicate",
+      "name": "3. Lookup Phone in Google Sheets (Members)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [700, 300],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-no-duplicate",
+              "leftValue": "={{ $json.Member_ID }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf1-node-4-if-not-duplicate",
+      "name": "4. IF Phone Not Registered",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "wf1-node-5-append-member",
+      "name": "5. Add Member to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('2. Validate, Normalize Phone & Calculate Expiry').item.json.Phone }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"gym_welcome_member_v1\",\n    \"language\": { \"code\": \"en\" },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          { \"type\": \"text\", \"text\": \"{{ $('2. Validate, Normalize Phone & Calculate Expiry').item.json.Name }}\" },\n          { \"type\": \"text\", \"text\": \"{{ $('2. Validate, Normalize Phone & Calculate Expiry').item.json.Member_ID }}\" },\n          { \"type\": \"text\", \"text\": \"{{ $('2. Validate, Normalize Phone & Calculate Expiry').item.json.Expiry_Date }}\" }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "wf1-node-6-whatsapp-welcome",
+      "name": "6. Send Welcome WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1460, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"ok\": false,\n  \"error\": \"Duplicate Member: Phone number is already registered.\"\n}",
+        "options": {
+          "responseCode": 409
+        }
+      },
+      "id": "wf1-node-7-reject-duplicate",
+      "name": "7. Respond 409 Duplicate Member",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 420]
+    }
+  ],
+  "connections": {
+    "1. Form Trigger (Webhook)": {
+      "main": [
+        [
+          {
+            "node": "2. Validate, Normalize Phone & Calculate Expiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Validate, Normalize Phone & Calculate Expiry": {
+      "main": [
+        [
+          {
+            "node": "3. Lookup Phone in Google Sheets (Members)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Lookup Phone in Google Sheets (Members)": {
+      "main": [
+        [
+          {
+            "node": "4. IF Phone Not Registered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. IF Phone Not Registered": {
+      "main": [
+        [
+          {
+            "node": "5. Add Member to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "7. Respond 409 Duplicate Member",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Add Member to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "6. Send Welcome WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Asia/Kolkata",
+    "executionOrder": "v1"
+  }
+}

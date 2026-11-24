@@ -1,0 +1,24 @@
+{
+  "name": "gym-manager-automation-system",
+  "version": "1.0.0",
+  "description": "Gym Manager Automation System — Full-Stack Web App + n8n Workflow Engine & Simulator",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "node scripts/test-all-workflows.js",
+    "seed": "node scripts/seed-sheets.js"
+  },
+  "keywords": [
+    "n8n",
+    "gym-management",
+    "razorpay",
+    "whatsapp-cloud-api",
+    "google-sheets",
+    "automation"
+  ],
+  "author": "Gym Manager SaaS",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^7.9.0"
+  }
+}

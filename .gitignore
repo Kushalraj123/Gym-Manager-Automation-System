@@ -1,0 +1,4 @@
+node_modules/
+.env
+database/mongo_config.json
+database/mongo_status.json

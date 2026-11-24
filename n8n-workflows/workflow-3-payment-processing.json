@@ -1,0 +1,308 @@
+{
+  "name": "Workflow 3 - Payment Processing (Razorpay Webhook & Manual)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gym-payment-webhook",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wf3-node-1-webhook",
+      "name": "1. Razorpay Webhook / Manual Payment Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "gym-payment-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node 2: Verify Razorpay HMAC-SHA256 Signature Using Raw Request Body & Secret\nconst crypto = require('crypto');\n\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst body = item.json.body || item.json;\nconst signature = headers['x-razorpay-signature'];\nconst secret = $env.RAZORPAY_WEBHOOK_SECRET;\n\n// If triggered via Razorpay Webhook, strictly verify HMAC-SHA256 signature\nif (signature || body.event) {\n  if (!signature || !secret) {\n    throw new Error('Security Error: Missing x-razorpay-signature header or RAZORPAY_WEBHOOK_SECRET.');\n  }\n  const rawBody = item.binary?.data\n    ? Buffer.from(item.binary.data.data, 'base64').toString('utf8')\n    : JSON.stringify(body);\n\n  const expectedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(rawBody, 'utf8')\n    .digest('hex');\n\n  const sigBuf = Buffer.from(String(signature), 'utf8');\n  const expBuf = Buffer.from(expectedSignature, 'utf8');\n  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {\n    throw new Error('Security Error: Invalid Razorpay HMAC-SHA256 Webhook Signature.');\n  }\n\n  const paymentEntity = body.payload?.payment?.entity || {};\n  const notes = paymentEntity.notes || {};\n  return [{\n    json: {\n      Source: 'RAZORPAY_WEBHOOK',\n      Member_ID: notes.member_id,\n      Plan: notes.plan || 'Monthly',\n      Duration_Months: Number(notes.duration_months || 1),\n      Amount: Math.round(Number(paymentEntity.amount || 0) / 100),\n      Payment_Method: 'Razorpay',\n      Razorpay_Reference: paymentEntity.id,\n      Payment_Status: 'Paid',\n      Webhook_Processed: 'TRUE'\n    }\n  }];\n}\n\n// Otherwise handle authenticated Manual Payment Form (Cash / UPI)\nreturn [{\n  json: {\n    Source: 'MANUAL_FORM',\n    Member_ID: body.memberId || body.Member_ID,\n    Plan: body.plan || 'Monthly',\n    Duration_Months: Number(body.durationMonths || 1),\n    Amount: Number(body.amount || 0),\n    Payment_Method: body.paymentMethod || 'Cash',\n    Razorpay_Reference: body.paymentReference || `MANUAL-${Date.now()}`,\n    Payment_Status: 'Paid',\n    Webhook_Processed: 'TRUE'\n  }\n}];"
+      },
+      "id": "wf3-node-2-verify-hmac",
+      "name": "2. Verify HMAC-SHA256 Signature & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Payments",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Razorpay_Reference",
+              "lookupValue": "={{ $json.Razorpay_Reference }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf3-node-3-check-duplicate-ref",
+      "name": "3. Check Duplicate Payment Reference (Payments)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [720, 300],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "idempotency-check",
+              "leftValue": "={{ $json.Payment_ID }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf3-node-4-if-new-payment",
+      "name": "4. IF Reference Not Already Processed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [980, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Member_ID",
+              "lookupValue": "={{ $('2. Verify HMAC-SHA256 Signature & Normalize').item.json.Member_ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf3-node-5-find-member",
+      "name": "5. Find Member in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1240, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node 6: Extend Membership Expiry Date with Month-End Clamping\nconst member = $input.first().json;\nconst payment = $('2. Verify HMAC-SHA256 Signature & Normalize').first().json;\n\nconst todayIST = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'Asia/Kolkata',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit'\n}).format(new Date());\n\nfunction addMonthsClamped(dateStr, monthsToAdd) {\n  const [year, month, day] = dateStr.split('-').map(Number);\n  const totalMonths = (month - 1) + Number(monthsToAdd);\n  const targetYear = year + Math.floor(totalMonths / 12);\n  const targetMonthIndex = totalMonths % 12;\n  const maxDaysInTargetMonth = new Date(Date.UTC(targetYear, targetMonthIndex + 1, 0)).getUTCDate();\n  const clampedDay = Math.min(day, maxDaysInTargetMonth);\n  return `${targetYear}-${String(targetMonthIndex + 1).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;\n}\n\n// If current Expiry_Date is still active (>= todayIST), extend from current Expiry_Date; otherwise extend from todayIST\nconst baseDate = (member.Expiry_Date && member.Expiry_Date >= todayIST) ? member.Expiry_Date : todayIST;\nconst newExpiryDate = addMonthsClamped(baseDate, payment.Duration_Months || 1);\n\nreturn [{\n  json: {\n    Member_ID: member.Member_ID,\n    Name: member.Name,\n    Phone: member.Phone,\n    Plan: payment.Plan || member.Plan,\n    Previous_Expiry_Date: member.Expiry_Date,\n    New_Expiry_Date: newExpiryDate,\n    Payment_ID: `PAY-${Date.now().toString().slice(-6)}`,\n    Amount: payment.Amount,\n    Payment_Method: payment.Payment_Method,\n    Payment_Status: 'Paid',\n    Payment_Date: todayIST,\n    Razorpay_Reference: payment.Razorpay_Reference,\n    Webhook_Processed: 'TRUE'\n  }\n}];"
+      },
+      "id": "wf3-node-6-extend-expiry",
+      "name": "6. Calculate Extended Membership Expiry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1480, 220]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Member_ID": "={{ $json.Member_ID }}",
+            "Plan": "={{ $json.Plan }}",
+            "Expiry_Date": "={{ $json.New_Expiry_Date }}",
+            "Payment_Status": "Paid",
+            "Payment_Method": "={{ $json.Payment_Method }}",
+            "Member_Status": "Active"
+          },
+          "matchingColumns": ["Member_ID"]
+        },
+        "options": {}
+      },
+      "id": "wf3-node-7-update-member",
+      "name": "7. Update Member Expiry & Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1720, 220]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Payments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Payment_ID": "={{ $('6. Calculate Extended Membership Expiry').item.json.Payment_ID }}",
+            "Member_ID": "={{ $('6. Calculate Extended Membership Expiry').item.json.Member_ID }}",
+            "Amount": "={{ $('6. Calculate Extended Membership Expiry').item.json.Amount }}",
+            "Payment_Method": "={{ $('6. Calculate Extended Membership Expiry').item.json.Payment_Method }}",
+            "Payment_Status": "Paid",
+            "Payment_Date": "={{ $('6. Calculate Extended Membership Expiry').item.json.Payment_Date }}",
+            "Razorpay_Reference": "={{ $('6. Calculate Extended Membership Expiry').item.json.Razorpay_Reference }}",
+            "Webhook_Processed": "TRUE"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf3-node-8-save-payment",
+      "name": "8. Save Transaction History (Payments)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1960, 220]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('6. Calculate Extended Membership Expiry').item.json.Phone }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"gym_payment_receipt_v1\",\n    \"language\": { \"code\": \"en\" },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          { \"type\": \"text\", \"text\": \"{{ $('6. Calculate Extended Membership Expiry').item.json.Name }}\" },\n          { \"type\": \"text\", \"text\": \"₹{{ $('6. Calculate Extended Membership Expiry').item.json.Amount }}\" },\n          { \"type\": \"text\", \"text\": \"{{ $('6. Calculate Extended Membership Expiry').item.json.New_Expiry_Date }}\" }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "wf3-node-9-notify-member",
+      "name": "9. Notify Member on WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2200, 220]
+    }
+  ],
+  "connections": {
+    "1. Razorpay Webhook / Manual Payment Trigger": {
+      "main": [
+        [
+          {
+            "node": "2. Verify HMAC-SHA256 Signature & Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Verify HMAC-SHA256 Signature & Normalize": {
+      "main": [
+        [
+          {
+            "node": "3. Check Duplicate Payment Reference (Payments)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Check Duplicate Payment Reference (Payments)": {
+      "main": [
+        [
+          {
+            "node": "4. IF Reference Not Already Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. IF Reference Not Already Processed": {
+      "main": [
+        [
+          {
+            "node": "5. Find Member in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Find Member in Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "6. Calculate Extended Membership Expiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6. Calculate Extended Membership Expiry": {
+      "main": [
+        [
+          {
+            "node": "7. Update Member Expiry & Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7. Update Member Expiry & Status": {
+      "main": [
+        [
+          {
+            "node": "8. Save Transaction History (Payments)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8. Save Transaction History (Payments)": {
+      "main": [
+        [
+          {
+            "node": "9. Notify Member on WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Asia/Kolkata",
+    "executionOrder": "v1"
+  }
+}

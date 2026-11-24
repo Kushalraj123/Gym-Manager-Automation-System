@@ -1,0 +1,939 @@
+{
+  "Gym_Settings": [
+    {
+      "Gym_Name": "IronFit Pro Fitness Studio",
+      "Owner_Email": "owner@ironfitgym.in",
+      "WhatsApp_Number": "919820011223",
+      "Monthly_Plan_Price": 2000,
+      "Quarterly_Plan_Price": 4000,
+      "Half_Yearly_Plan_Price": 6000,
+      "Yearly_Plan_Price": 9000,
+      "Reminder_Time": "08:00"
+    }
+  ],
+  "Members": [
+    {
+      "Member_ID": "GYM-1001",
+      "Name": "Aarav Sharma",
+      "Phone": "919876543210",
+      "Email": "aarav.sharma@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-11-09",
+      "Expiry_Date": "2027-04-07",
+      "Payment_Status": "Paid",
+      "Payment_Method": "Razorpay",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "",
+      "Member_Status": "Active"
+    },
+    {
+      "Member_ID": "GYM-1002",
+      "Name": "Priya Patel",
+      "Phone": "919876543211",
+      "Email": "priya.patel@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-10-28",
+      "Expiry_Date": "2026-11-27",
+      "Payment_Status": "Paid",
+      "Payment_Method": "UPI",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "2026-11-24",
+      "Member_Status": "Expiring Soon"
+    },
+    {
+      "Member_ID": "GYM-1003",
+      "Name": "Rohan Verma",
+      "Phone": "919876543212",
+      "Email": "rohan.verma@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-10-25",
+      "Expiry_Date": "2026-11-24",
+      "Payment_Status": "Paid",
+      "Payment_Method": "Cash",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "2026-11-24",
+      "Member_Status": "Expiring Today"
+    },
+    {
+      "Member_ID": "GYM-1004",
+      "Name": "Sneha Nair",
+      "Phone": "919876543213",
+      "Email": "sneha.nair@example.in",
+      "Plan": "Quarterly",
+      "Joining_Date": "2026-10-10",
+      "Expiry_Date": "2027-02-24",
+      "Payment_Status": "Paid",
+      "Payment_Method": "Razorpay",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "2026-11-09",
+      "Member_Status": "Active"
+    },
+    {
+      "Member_ID": "GYM-1005",
+      "Name": "Vikram Singhania",
+      "Phone": "919876543214",
+      "Email": "vikram.s@example.in",
+      "Plan": "Yearly",
+      "Joining_Date": "2026-11-24",
+      "Expiry_Date": "2027-10-30",
+      "Payment_Status": "Paid",
+      "Payment_Method": "Razorpay",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "",
+      "Member_Status": "Active"
+    },
+    {
+      "Member_ID": "GYM-1006",
+      "Name": "Ananya Gupta",
+      "Phone": "919876543215",
+      "Email": "ananya.g@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-10-28",
+      "Expiry_Date": "2026-11-27",
+      "Payment_Status": "Paid",
+      "Payment_Method": "Cash",
+      "WhatsApp_Consent": "FALSE",
+      "Last_Reminder_Date": "",
+      "Member_Status": "Expiring Soon"
+    },
+    {
+      "Member_ID": "GYM-1007",
+      "Name": "Karthik Reddy",
+      "Phone": "919876543216",
+      "Email": "karthik.r@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-11-24",
+      "Expiry_Date": "2026-12-19",
+      "Payment_Status": "Pending",
+      "Payment_Method": "UPI",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "",
+      "Member_Status": "Active"
+    },
+    {
+      "Member_ID": "GYM-1008",
+      "Name": "Karan Johar",
+      "Phone": "919811122333",
+      "Email": "karan.j@example.in",
+      "Plan": "Monthly",
+      "Joining_Date": "2026-01-31",
+      "Expiry_Date": "2026-02-28",
+      "Payment_Status": "Paid",
+      "Payment_Method": "UPI",
+      "WhatsApp_Consent": "TRUE",
+      "Last_Reminder_Date": "",
+      "Member_Status": "Expired"
+    }
+  ],
+  "Payments": [
+    {
+      "Payment_ID": "PAY-5001",
+      "Member_ID": "GYM-1001",
+      "Amount": 4000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-09",
+      "Razorpay_Reference": "pay_RzpSeedRef1001",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5002",
+      "Member_ID": "GYM-1002",
+      "Amount": 2000,
+      "Payment_Method": "UPI",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-10-28",
+      "Razorpay_Reference": "UPI-2026-88412",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5003",
+      "Member_ID": "GYM-1003",
+      "Amount": 2000,
+      "Payment_Method": "Cash",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-10-25",
+      "Razorpay_Reference": "CASH-RECEIPT-103",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5004",
+      "Member_ID": "GYM-1005",
+      "Amount": 9000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_RzpSeedRef1005",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5005",
+      "Member_ID": "GYM-1007",
+      "Amount": 2000,
+      "Payment_Method": "UPI",
+      "Payment_Status": "Pending",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "PENDING-GYM-1007",
+      "Webhook_Processed": "FALSE"
+    },
+    {
+      "Payment_ID": "PAY-5006",
+      "Member_ID": "GYM-1008",
+      "Amount": 2000,
+      "Payment_Method": "UPI",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-01-31",
+      "Razorpay_Reference": "UPI-REG-GYM-1008",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5007",
+      "Member_ID": "GYM-1004",
+      "Amount": 4000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_Rzp446201049c",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5008",
+      "Member_ID": "GYM-1001",
+      "Amount": 2000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_Rzp511279412d",
+      "Webhook_Processed": "TRUE"
+    },
+    {
+      "Payment_ID": "PAY-5009",
+      "Member_ID": "GYM-1001",
+      "Amount": 2000,
+      "Payment_Method": "Razorpay",
+      "Payment_Status": "Paid",
+      "Payment_Date": "2026-11-24",
+      "Razorpay_Reference": "pay_Rzp51164248ba",
+      "Webhook_Processed": "TRUE"
+    }
+  ],
+  "Reminder_Logs": [
+    {
+      "Reminder_ID": "REM-9001",
+      "Member_ID": "GYM-1004",
+      "Phone": "919876543213",
+      "Reminder_Type": "TODAY_EXPIRY",
+      "Sent_Date": "2026-11-09",
+      "Delivery_Status": "SENT (wamid.HBgMOTE5ODc2NTQzMjEzFQIAERgSRjA1)"
+    },
+    {
+      "Reminder_ID": "REM-9002",
+      "Member_ID": "GYM-1002",
+      "Phone": "919876543211",
+      "Reminder_Type": "3DAY_EXPIRY",
+      "Sent_Date": "2026-11-24",
+      "Delivery_Status": "SENT (wamid.HBgM919876543211REM179552446193939)"
+    },
+    {
+      "Reminder_ID": "REM-9003",
+      "Member_ID": "GYM-1003",
+      "Phone": "919876543212",
+      "Reminder_Type": "TODAY_EXPIRY",
+      "Sent_Date": "2026-11-24",
+      "Delivery_Status": "SENT (wamid.HBgM919876543212REM179552446193920)"
+    }
+  ],
+  "Trainers": [
+    {
+      "Trainer_ID": "TRN-201",
+      "Name": "Coach Rajesh Kumar",
+      "Phone": "919820099101",
+      "Email": "rajesh.trainer@ironfitgym.in",
+      "Specialty": "Strength, Powerlifting & Hypertrophy",
+      "Shift": "Morning (06:00 AM - 02:00 PM)",
+      "Experience_Years": "8 Years",
+      "Certifications": "ACE Certified Personal Trainer • CSCS Strength Coach • Sports Nutritionist",
+      "Qualification": "B.P.Ed (Sports Science) & National Powerlifting Gold Medalist",
+      "Languages": "English, Hindi, Kannada",
+      "Rating": "4.9 ★ (140+ Clients)",
+      "Consultation_Slot": "Mon - Sat • 07:00 AM - 12:30 PM (Floor Zone A)",
+      "Bio": "Specializes in progressive overload, compound strength mechanics, posture correction, and lean muscle hypertrophy.",
+      "Pin": "1234"
+    },
+    {
+      "Trainer_ID": "TRN-202",
+      "Name": "Coach Neha Kapoor",
+      "Phone": "919820099102",
+      "Email": "neha.trainer@ironfitgym.in",
+      "Specialty": "HIIT, Metabolic Fat Loss & Functional Mobility",
+      "Shift": "Evening (02:00 PM - 10:00 PM)",
+      "Experience_Years": "6 Years",
+      "Certifications": "NASM-CPT • CrossFit Level 2 Trainer • Precision Nutrition L1",
+      "Qualification": "M.Sc. Exercise Physiology & Certified Kettlebell Specialist",
+      "Languages": "English, Hindi",
+      "Rating": "4.95 ★ (115+ Clients)",
+      "Consultation_Slot": "Mon - Sat • 04:00 PM - 09:00 PM (Functional Studio B)",
+      "Bio": "Specializes in sustainable fat loss, athletic conditioning, core rehabilitation, and customized macro-based nutrition.",
+      "Pin": "1234"
+    }
+  ],
+  "Member_Profiles": {
+    "GYM-1001": {
+      "Assigned_Trainer_ID": "TRN-201",
+      "Workout_Plan": "4-Day Upper / Lower Strength Split (Bench, Squat, Deadlift, Overhead Press)",
+      "Diet_Notes": "High Protein (140g/day) • 2,400 kcal • Creatine 5g post-workout",
+      "Attendance_Count": 18,
+      "Last_CheckIn": "2026-11-24"
+    },
+    "GYM-1002": {
+      "Assigned_Trainer_ID": "TRN-202",
+      "Workout_Plan": "3-Day Full Body Circuit + 2-Day HIIT Cardio Conditioning",
+      "Diet_Notes": "Calorie Deficit (1,650 kcal) • 100g Protein • 3L Hydration",
+      "Attendance_Count": 14,
+      "Last_CheckIn": "2026-11-09"
+    },
+    "GYM-1003": {
+      "Assigned_Trainer_ID": "TRN-201",
+      "Workout_Plan": "Push / Pull / Legs (6-Day Intermediate Hypertrophy)",
+      "Diet_Notes": "Maintenance (2,200 kcal) • Pre-workout Complex Carbs",
+      "Attendance_Count": 22,
+      "Last_CheckIn": "2026-11-24"
+    },
+    "GYM-1004": {
+      "Assigned_Trainer_ID": "TRN-202",
+      "Workout_Plan": "Core Stability & Functional Strength Foundation",
+      "Diet_Notes": "Balanced Macro Split (40% Carbs / 30% Protein / 30% Fats)",
+      "Attendance_Count": 9,
+      "Last_CheckIn": "2026-11-09"
+    },
+    "GYM-1005": {
+      "Assigned_Trainer_ID": "TRN-201",
+      "Workout_Plan": "5-Day Powerbuilding Program + Olympic Lifts",
+      "Diet_Notes": "Lean Bulk (2,750 kcal) • 160g Protein • Electrolytes",
+      "Attendance_Count": 26,
+      "Last_CheckIn": "2026-11-24"
+    },
+    "GYM-1006": {
+      "Assigned_Trainer_ID": "TRN-202",
+      "Workout_Plan": "3-Day Kettlebell & Mobility Flow",
+      "Diet_Notes": "1,800 kcal Whole-Food Plan",
+      "Attendance_Count": 11,
+      "Last_CheckIn": "2026-11-09"
+    },
+    "GYM-1007": {
+      "Assigned_Trainer_ID": "TRN-201",
+      "Workout_Plan": "Beginner 3-Day Compound Strength Routine",
+      "Diet_Notes": "2,100 kcal High-Protein Vegetarian Plan",
+      "Attendance_Count": 3,
+      "Last_CheckIn": "2026-11-24"
+    }
+  },
+  "Execution_Audit_Logs": [
+    {
+      "executionId": "EXEC-1795525116436-852",
+      "timestamp": "2026-11-24 18:28:36",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹2000 (Razorpay | Ref: pay_Rzp51164248ba) processed for Aarav Sharma (GYM-1001). Expiry extended: 2027-03-07 -> 2027-04-07.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:28:36"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp51164248ba",
+            "amountInRupees": 2000,
+            "memberId": "GYM-1001"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "pay_Rzp51164248ba"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1001",
+            "previousExpiryDate": "2027-03-07",
+            "newExpiryDate": "2027-04-07",
+            "paymentRow": {
+              "Payment_ID": "PAY-5009",
+              "Member_ID": "GYM-1001",
+              "Amount": 2000,
+              "Payment_Method": "Razorpay",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "pay_Rzp51164248ba",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543210",
+            "messageId": "wamid.HBgM919876543210PAY1795525116436",
+            "previewText": "Hello Aarav Sharma, we have received your payment of ₹2000 via Razorpay (Ref: pay_Rzp51164248ba). Your gym membership (GYM-1001) is now active until 2027-04-07. Thank you!"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795525112807-998",
+      "timestamp": "2026-11-24 18:28:32",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹2000 (Razorpay | Ref: pay_Rzp511279412d) processed for Aarav Sharma (GYM-1001). Expiry extended: 2027-02-07 -> 2027-03-07.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:28:32"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp511279412d",
+            "amountInRupees": 2000,
+            "memberId": "GYM-1001"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "pay_Rzp511279412d"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1001",
+            "previousExpiryDate": "2027-02-07",
+            "newExpiryDate": "2027-03-07",
+            "paymentRow": {
+              "Payment_ID": "PAY-5008",
+              "Member_ID": "GYM-1001",
+              "Amount": 2000,
+              "Payment_Method": "Razorpay",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "pay_Rzp511279412d",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543210",
+            "messageId": "wamid.HBgM919876543210PAY1795525112807",
+            "previewText": "Hello Aarav Sharma, we have received your payment of ₹2000 via Razorpay (Ref: pay_Rzp511279412d). Your gym membership (GYM-1001) is now active until 2027-03-07. Thank you!"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524462044-569",
+      "timestamp": "2026-11-24 18:17:42",
+      "workflow": "Workflow 4: Daily Gym Report",
+      "status": "SUCCESS",
+      "summary": "Generated Daily Report for 2026-11-24 -> Sent to owner@ironfitgym.in | Active: 7/8 | Revenue Today: ₹13000",
+      "nodeTrace": [
+        {
+          "node": "1-3. Schedule Trigger + Read Members & Payments (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "membersCount": 8,
+            "paymentsCount": 7
+          }
+        },
+        {
+          "node": "4-5. Calculate Statistics & Generate HTML Report (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "reportDate": "2026-11-24",
+            "gymName": "IronFit Pro Fitness Studio",
+            "ownerEmail": "owner@ironfitgym.in",
+            "totalRegisteredMembers": 8,
+            "currentlyActiveMembers": 7,
+            "expiredMemberships": 1,
+            "membershipsExpiringToday": 1,
+            "membershipsExpiringIn3Days": 2,
+            "pendingPayments": 1,
+            "paymentsReceivedToday": 2,
+            "totalRevenueCollectedToday": 13000,
+            "totalAllTimeRevenue": 23000
+          }
+        },
+        {
+          "node": "6. Send Daily Report Email to Gym Owner (Gmail Node)",
+          "type": "n8n-nodes-base.gmail",
+          "status": "SUCCESS",
+          "output": {
+            "to": "owner@ironfitgym.in",
+            "subject": "[IronFit Pro Fitness Studio] Daily Business Summary — 2026-11-24 | Revenue Today: ₹13000"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524462032-513",
+      "timestamp": "2026-11-24 18:17:42",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "IDEMPOTENT_SKIP",
+      "summary": "Idempotent skip: Payment reference \"pay_Rzp446201049c\" was already processed under PAY-5007. Membership expiry was NOT double-extended.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:17:42"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp446201049c",
+            "amountInRupees": 4000,
+            "memberId": "GYM-1004"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "IDEMPOTENT_DUPLICATE_BLOCKED",
+          "output": {
+            "existingPaymentId": "PAY-5007",
+            "Razorpay_Reference": "pay_Rzp446201049c"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524462023-254",
+      "timestamp": "2026-11-24 18:17:42",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SUCCESS",
+      "summary": "Payment ₹4000 (Razorpay | Ref: pay_Rzp446201049c) processed for Sneha Nair (GYM-1004). Expiry extended: 2026-11-09 -> 2027-02-24.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:17:42"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "signatureVerified": true,
+            "eventType": "payment_link.paid",
+            "paymentReference": "pay_Rzp446201049c",
+            "amountInRupees": 4000,
+            "memberId": "GYM-1004"
+          }
+        },
+        {
+          "node": "3. Check Duplicate Payment Reference (Idempotency IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicateReference": false,
+            "Razorpay_Reference": "pay_Rzp446201049c"
+          }
+        },
+        {
+          "node": "5-7. Update Member Expiry & Record Payment Transaction (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1004",
+            "previousExpiryDate": "2026-11-09",
+            "newExpiryDate": "2027-02-24",
+            "paymentRow": {
+              "Payment_ID": "PAY-5007",
+              "Member_ID": "GYM-1004",
+              "Amount": 4000,
+              "Payment_Method": "Razorpay",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-11-24",
+              "Razorpay_Reference": "pay_Rzp446201049c",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "8. Notify Member on WhatsApp (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_payment_receipt_v1",
+            "recipient": "919876543213",
+            "messageId": "wamid.HBgM919876543213PAY1795524462023",
+            "previewText": "Hello Sneha Nair, we have received your payment of ₹4000 via Razorpay (Ref: pay_Rzp446201049c). Your gym membership (GYM-1004) is now active until 2027-02-24. Thank you!"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524462015-296",
+      "timestamp": "2026-11-24 18:17:42",
+      "workflow": "Workflow 3: Payment Processing",
+      "status": "SECURITY_REJECTED",
+      "summary": "Rejected unverified Razorpay webhook: Signature length mismatch.",
+      "nodeTrace": [
+        {
+          "node": "1. Razorpay Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "source": "RAZORPAY_WEBHOOK",
+            "receivedAt": "2026-11-24 18:17:42"
+          }
+        },
+        {
+          "node": "2. Verify Razorpay HMAC-SHA256 Signature (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SECURITY_REJECTED",
+          "output": {
+            "verified": false,
+            "reason": "Signature length mismatch."
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524461992-665",
+      "timestamp": "2026-11-24 18:17:41",
+      "workflow": "Workflow 2: Expiry Reminders",
+      "status": "SUCCESS",
+      "summary": "Processed 8 members for 2026-11-24: Sent 0 WhatsApp reminder(s), Skipped 3 (consent/duplicate).",
+      "nodeTrace": [
+        {
+          "node": "1. Schedule Trigger (08:00 IST Daily)",
+          "type": "n8n-nodes-base.scheduleTrigger",
+          "status": "SUCCESS",
+          "output": {
+            "referenceDate": "2026-11-24",
+            "timezone": "Asia/Kolkata"
+          }
+        },
+        {
+          "node": "2. Read Members & Reminder_Logs (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "totalMembersRead": 8,
+            "totalLogsRead": 3
+          }
+        },
+        {
+          "node": "3-5. Calculate Days, Filter (3d & 0d), Check Consent & Deduplicate (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "qualifyingToSend": 0,
+            "skippedCount": 3,
+            "skippedDetails": [
+              {
+                "Member_ID": "GYM-1002",
+                "Name": "Priya Patel",
+                "Reminder_Type": "3DAY_EXPIRY",
+                "reason": "Duplicate prevented: Reminder already sent on 2026-11-24"
+              },
+              {
+                "Member_ID": "GYM-1003",
+                "Name": "Rohan Verma",
+                "Reminder_Type": "TODAY_EXPIRY",
+                "reason": "Duplicate prevented: Reminder already sent on 2026-11-24"
+              },
+              {
+                "Member_ID": "GYM-1006",
+                "Name": "Ananya Gupta",
+                "Reminder_Type": "3DAY_EXPIRY",
+                "reason": "WhatsApp_Consent is FALSE"
+              }
+            ]
+          }
+        },
+        {
+          "node": "6-7. Send WhatsApp Templates & Save Reminder_Logs (HTTP Request + Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "sentReminders": []
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524461939-832",
+      "timestamp": "2026-11-24 18:17:41",
+      "workflow": "Workflow 2: Expiry Reminders",
+      "status": "SUCCESS",
+      "summary": "Processed 8 members for 2026-11-24: Sent 2 WhatsApp reminder(s), Skipped 1 (consent/duplicate).",
+      "nodeTrace": [
+        {
+          "node": "1. Schedule Trigger (08:00 IST Daily)",
+          "type": "n8n-nodes-base.scheduleTrigger",
+          "status": "SUCCESS",
+          "output": {
+            "referenceDate": "2026-11-24",
+            "timezone": "Asia/Kolkata"
+          }
+        },
+        {
+          "node": "2. Read Members & Reminder_Logs (Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "totalMembersRead": 8,
+            "totalLogsRead": 1
+          }
+        },
+        {
+          "node": "3-5. Calculate Days, Filter (3d & 0d), Check Consent & Deduplicate (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "qualifyingToSend": 2,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "Member_ID": "GYM-1006",
+                "Name": "Ananya Gupta",
+                "Reminder_Type": "3DAY_EXPIRY",
+                "reason": "WhatsApp_Consent is FALSE"
+              }
+            ]
+          }
+        },
+        {
+          "node": "6-7. Send WhatsApp Templates & Save Reminder_Logs (HTTP Request + Google Sheets)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "sentReminders": [
+              {
+                "Reminder_ID": "REM-9002",
+                "Member_ID": "GYM-1002",
+                "Phone": "919876543211",
+                "Reminder_Type": "3DAY_EXPIRY",
+                "Sent_Date": "2026-11-24",
+                "Delivery_Status": "SENT (wamid.HBgM919876543211REM179552446193939)",
+                "Name": "Priya Patel",
+                "Expiry_Date": "2026-11-27",
+                "Template_Name": "gym_expiry_3day_reminder",
+                "Message_Preview": "Hello Priya Patel, your gym membership expires in 3 days. Please renew your membership to continue enjoying our facilities. Thank you!"
+              },
+              {
+                "Reminder_ID": "REM-9003",
+                "Member_ID": "GYM-1003",
+                "Phone": "919876543212",
+                "Reminder_Type": "TODAY_EXPIRY",
+                "Sent_Date": "2026-11-24",
+                "Delivery_Status": "SENT (wamid.HBgM919876543212REM179552446193920)",
+                "Name": "Rohan Verma",
+                "Expiry_Date": "2026-11-24",
+                "Template_Name": "gym_expiry_today_reminder",
+                "Message_Preview": "Hello Rohan Verma, your gym membership expires today. Please renew your plan to continue your fitness journey!"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524461932-512",
+      "timestamp": "2026-11-24 18:17:41",
+      "workflow": "Workflow 1: Member Registration",
+      "status": "DUPLICATE_BLOCKED",
+      "summary": "Duplicate member detected: Phone 919811122333 is already registered to Karan Johar (GYM-1008).",
+      "nodeTrace": [
+        {
+          "node": "1. Form / Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "name": "Karan Duplicate",
+            "phone": "09811122333",
+            "email": "dup@example.in",
+            "plan": "Monthly",
+            "joiningDate": "2026-11-24"
+          }
+        },
+        {
+          "node": "2. Validate Input & Normalize Phone (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "normalizedPhone": "919811122333",
+            "phone10": "9811122333",
+            "joiningDate": "2026-11-24",
+            "durationMonths": 1
+          }
+        },
+        {
+          "node": "3. Check Duplicate Phone (Google Sheets Lookup + IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "DUPLICATE_BLOCKED",
+          "output": {
+            "existingMemberId": "GYM-1008",
+            "existingName": "Karan Johar"
+          }
+        }
+      ]
+    },
+    {
+      "executionId": "EXEC-1795524461923-327",
+      "timestamp": "2026-11-24 18:17:41",
+      "workflow": "Workflow 1: Member Registration",
+      "status": "SUCCESS",
+      "summary": "Registered Karan Johar (GYM-1008) | Phone: 919811122333 | Expiry: 2026-02-28 | Payment: Paid (₹2000)",
+      "nodeTrace": [
+        {
+          "node": "1. Form / Webhook Trigger",
+          "type": "n8n-nodes-base.webhook",
+          "status": "SUCCESS",
+          "output": {
+            "name": "Karan Johar",
+            "phone": "+91 98111 22333",
+            "email": "karan.j@example.in",
+            "plan": "Monthly",
+            "durationMonths": 1,
+            "joiningDate": "2026-01-31",
+            "paymentStatus": "Paid",
+            "paymentMethod": "UPI",
+            "whatsappConsent": true
+          }
+        },
+        {
+          "node": "2. Validate Input & Normalize Phone (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "normalizedPhone": "919811122333",
+            "phone10": "9811122333",
+            "joiningDate": "2026-01-31",
+            "durationMonths": 1
+          }
+        },
+        {
+          "node": "3. Check Duplicate Phone (Google Sheets Lookup + IF Node)",
+          "type": "n8n-nodes-base.if",
+          "status": "SUCCESS",
+          "output": {
+            "isDuplicate": false
+          }
+        },
+        {
+          "node": "4. Calculate Expiry & Member ID (Code Node)",
+          "type": "n8n-nodes-base.code",
+          "status": "SUCCESS",
+          "output": {
+            "Member_ID": "GYM-1008",
+            "Joining_Date": "2026-01-31",
+            "Duration_Months": 1,
+            "Expiry_Date": "2026-02-28",
+            "Member_Status": "Expired"
+          }
+        },
+        {
+          "node": "5. Add Member to Google Sheets (Members & Payments)",
+          "type": "n8n-nodes-base.googleSheets",
+          "status": "SUCCESS",
+          "output": {
+            "memberRow": {
+              "Member_ID": "GYM-1008",
+              "Name": "Karan Johar",
+              "Phone": "919811122333",
+              "Email": "karan.j@example.in",
+              "Plan": "Monthly",
+              "Joining_Date": "2026-01-31",
+              "Expiry_Date": "2026-02-28",
+              "Payment_Status": "Paid",
+              "Payment_Method": "UPI",
+              "WhatsApp_Consent": "TRUE",
+              "Last_Reminder_Date": "",
+              "Member_Status": "Expired"
+            },
+            "paymentRow": {
+              "Payment_ID": "PAY-5006",
+              "Member_ID": "GYM-1008",
+              "Amount": 2000,
+              "Payment_Method": "UPI",
+              "Payment_Status": "Paid",
+              "Payment_Date": "2026-01-31",
+              "Razorpay_Reference": "UPI-REG-GYM-1008",
+              "Webhook_Processed": "TRUE"
+            }
+          }
+        },
+        {
+          "node": "6. Send Welcome WhatsApp Message (HTTP Request -> Meta Graph API)",
+          "type": "n8n-nodes-base.httpRequest",
+          "status": "SUCCESS",
+          "output": {
+            "sent": true,
+            "templateName": "gym_welcome_member_v1",
+            "recipient": "919811122333",
+            "messageId": "wamid.HBgM919811122333WELCOME1795524461923",
+            "previewText": "Welcome to IronFit Pro Fitness Studio, Karan Johar! 🏋️‍♂️ Your Monthly membership (GYM-1008) is active from 2026-01-31 until 2026-02-28. Payment Status: Paid (₹2000). Let's crush your fitness goals!"
+          }
+        }
+      ]
+    }
+  ]
+}

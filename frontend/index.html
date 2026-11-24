@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Manager Automation System</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <!-- ====================================================================
+       FULL-SCREEN DEDICATED LOGIN PAGE
+       ==================================================================== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-icon brand-icon-lg">
+          <svg viewBox="0 0 64 64" width="34" height="34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer Hex Crest -->
+            <path d="M32 4L56 17.8V46.2L32 60L8 46.2V17.8L32 4Z" stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
+              fill="rgba(15,23,42,0.35)" />
+            <!-- Left Dumbbell Plates -->
+            <rect x="11" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+            <rect x="17" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+            <!-- Center Knurled Barbell Shaft with Lightning Pulse -->
+            <rect x="22.5" y="29.5" width="19" height="5" rx="1.5" fill="#A7F3D0" />
+            <path d="M33.5 21L27.5 32.5H33L30.5 43L37.5 31H32L33.5 21Z" fill="#34D399" />
+            <!-- Right Dumbbell Plates -->
+            <rect x="41.5" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+            <rect x="48.5" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+          </svg>
+        </div>
+        <div>
+          <h1 id="loginGymTitle" style="font-size:22px;font-weight:700;color:#fff;">IronFit Pro Fitness Studio</h1>
+          <p class="text-muted">Gym Manager Automation System • Select your portal role to sign in</p>
+        </div>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="login-role-tabs">
+        <button type="button" class="role-tab-btn active" data-role="OWNER" onclick="selectLoginRole('OWNER')">
+          👑 Gym Owner / Admin
+        </button>
+        <button type="button" class="role-tab-btn" data-role="TRAINER" onclick="selectLoginRole('TRAINER')">
+          🏋️‍♂️ Gym Trainer
+        </button>
+        <button type="button" class="role-tab-btn" data-role="MEMBER" onclick="selectLoginRole('MEMBER')">
+          🏃‍♂️ Gym Member
+        </button>
+      </div>
+
+      <!-- Error Banner inside Login Page -->
+      <div id="loginErrorBox" class="toast-banner toast-error hidden" style="margin-bottom:16px;"></div>
+
+      <!-- 1. GYM OWNER LOGIN FORM -->
+      <form id="ownerLoginForm" class="login-role-form"
+        onsubmit="event.preventDefault(); submitRoleLoginForm('OWNER');">
+        <div class="form-group">
+          <label>Owner Email / Admin ID</label>
+          <input type="text" id="ownerLoginId" required value="owner@ironfitgym.in" placeholder="owner@ironfitgym.in" />
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label>Admin PIN / Password</label>
+          <input type="password" id="ownerLoginPin" required value="1234" placeholder="Default: 1234" />
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); submitRoleLoginForm('OWNER');"
+          style="width:100%;margin-top:18px;padding:12px;">
+          🔐 Sign In to Gym Owner Command Center
+        </button>
+        <div class="quick-demo-bar">
+          <span>Quick Demo Login:</span>
+          <button type="button" class="btn btn-outline btn-sm"
+            onclick="quickLogin('OWNER','owner@ironfitgym.in','1234')">
+            ⚡ One-Click Owner Admin
+          </button>
+        </div>
+      </form>
+
+      <!-- 2. GYM TRAINER LOGIN FORM -->
+      <form id="trainerLoginForm" class="login-role-form hidden"
+        onsubmit="event.preventDefault(); submitRoleLoginForm('TRAINER');">
+        <div class="form-group">
+          <label>Trainer ID or Registered Mobile Number *</label>
+          <input type="text" id="trainerLoginId" required value="TRN-201" placeholder="e.g. TRN-201 or 9820099101" />
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label>Trainer PIN *</label>
+          <input type="password" id="trainerLoginPin" required value="1234" placeholder="Default: 1234" />
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); submitRoleLoginForm('TRAINER');"
+          style="width:100%;margin-top:18px;padding:12px;">
+          🔐 Sign In to Trainer Portal
+        </button>
+        <div class="quick-demo-bar">
+          <span>Quick Demo Trainers:</span>
+          <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('TRAINER','TRN-201','1234')">
+            ⚡ Coach Rajesh (TRN-201)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('TRAINER','TRN-202','1234')">
+            ⚡ Coach Neha (TRN-202)
+          </button>
+        </div>
+      </form>
+
+      <!-- 3. GYM MEMBER LOGIN FORM -->
+      <form id="memberLoginForm" class="login-role-form hidden"
+        onsubmit="event.preventDefault(); submitRoleLoginForm('MEMBER');">
+        <div class="form-group">
+          <label>Member ID or Registered Mobile Number *</label>
+          <input type="text" id="memberLoginId" required value="GYM-1001" placeholder="e.g. GYM-1001 or 9876543210" />
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label>Member PIN (1234 or Last 4 digits of Phone) *</label>
+          <input type="password" id="memberLoginPin" required value="1234" placeholder="1234" />
+        </div>
+        <button type="submit" class="btn btn-secondary" onclick="event.preventDefault(); submitRoleLoginForm('MEMBER');"
+          style="width:100%;margin-top:18px;padding:12px;">
+          🔐 Sign In to Member Self-Service Portal
+        </button>
+        <div class="quick-demo-bar">
+          <span>Quick Demo Members:</span>
+          <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('MEMBER','GYM-1001','1234')">
+            ⚡ Aarav (Active)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('MEMBER','GYM-1002','1234')">
+            ⚡ Priya (Expiring 3d)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('MEMBER','GYM-1004','1234')">
+            ⚡ Sneha (Expired)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="appShell" class="app-layout hidden">
+    <!-- Top Horizontal Navigation Bar -->
+    <aside class="sidebar">
+      <div class="sidebar-top-row">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 64 64" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 4L56 17.8V46.2L32 60L8 46.2V17.8L32 4Z" stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
+                fill="rgba(15,23,42,0.35)" />
+              <rect x="11" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+              <rect x="17" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+              <rect x="22.5" y="29.5" width="19" height="5" rx="1.5" fill="#A7F3D0" />
+              <path d="M33.5 21L27.5 32.5H33L30.5 43L37.5 31H32L33.5 21Z" fill="#34D399" />
+              <rect x="41.5" y="17" width="5.5" height="30" rx="2.5" fill="#F8FAFC" />
+              <rect x="48.5" y="21" width="4.5" height="22" rx="2.2" fill="#FFFFFF" />
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title" id="sidebarGymName">IronFit Pro Studio</div>
+            <div class="brand-subtitle">n8n + Google Sheets SaaS</div>
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="tz-badge" style="cursor:pointer;" onclick="switchTab('mongodb')"
+            title="Click to configure MongoDB Atlas Cloud Sync">
+            <span>🍃 MongoDB Atlas:</span>
+            <strong id="topMongoBadge" style="color:#34d399;">Connected (gym_manager_saas)</strong>
+          </div>
+          <div class="tz-badge">
+            <span>🕒 IST:</span>
+            <strong id="sidebarTodayIST">--</strong>
+          </div>
+
+          <!-- User Account Info & Dropdown Popover -->
+          <div class="user-account-menu">
+            <button type="button" class="user-account-btn" id="userAccountBtn"
+              onclick="toggleUserAccountDropdown(event)">
+              <div class="user-avatar" id="navUserAvatar">AD</div>
+              <div class="user-btn-meta">
+                <div class="user-btn-name" id="navUserName">Gym Owner</div>
+                <div class="user-btn-role" id="navUserRole">OWNER • ADMIN</div>
+              </div>
+              <span class="user-caret">▾</span>
+            </button>
+
+            <div class="user-dropdown-card hidden" id="userAccountDropdown">
+              <div class="user-dropdown-header">
+                <div class="user-avatar user-avatar-lg" id="dropUserAvatar">AD</div>
+                <div>
+                  <div class="drop-user-name" id="dropUserName">Gym Owner / Admin</div>
+                  <span class="badge badge-active" id="dropUserRoleBadge">OWNER</span>
+                </div>
+              </div>
+              <div class="user-dropdown-details">
+                <div class="drop-detail-row">
+                  <span>Account ID</span>
+                  <strong id="dropUserId">OWNER-1</strong>
+                </div>
+                <div class="drop-detail-row">
+                  <span>Phone</span>
+                  <strong id="dropUserContact">+919820011223</strong>
+                </div>
+                <div class="drop-detail-row">
+                  <span>Email</span>
+                  <strong id="dropUserEmail">owner@ironfitgym.in</strong>
+                </div>
+                <div class="drop-detail-row">
+                  <span>Plan / Specialty</span>
+                  <strong id="dropUserExtra">Full System Access</strong>
+                </div>
+              </div>
+              <div class="user-dropdown-footer">
+                <button type="button" class="btn btn-danger-outline btn-sm" style="width:100%;"
+                  onclick="logoutToLoginPage()">
+                  🚪 Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-menu" id="ownerNavMenu">
+        <button class="nav-btn active" data-tab="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Live Dashboard & KPIs</span>
+        </button>
+        <button class="nav-btn" data-tab="register">
+          <span class="nav-icon">➕</span>
+          <span>WF1: Register Member</span>
+        </button>
+        <button class="nav-btn" data-tab="reminders">
+          <span class="nav-icon">💬</span>
+          <span>WF2: WhatsApp Reminders</span>
+        </button>
+        <button class="nav-btn" data-tab="payments">
+          <span class="nav-icon">💳</span>
+          <span>WF3: Razorpay & Cash/UPI</span>
+        </button>
+        <button class="nav-btn" data-tab="report">
+          <span class="nav-icon">📧</span>
+          <span>WF4: Daily Owner Report</span>
+        </button>
+        <button class="nav-btn" data-tab="sheets">
+          <span class="nav-icon">📗</span>
+          <span>Google Sheets (4 Tabs)</span>
+        </button>
+        <button class="nav-btn" data-tab="mongodb">
+          <span class="nav-icon">🍃</span>
+          <span>MongoDB Atlas Cloud</span>
+        </button>
+        <button class="nav-btn" data-tab="n8n">
+          <span class="nav-icon">⚡</span>
+          <span>n8n Workflows & Logs</span>
+        </button>
+        <button class="nav-btn" data-tab="settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Gym Settings & SaaS Model</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header" id="ownerTopHeader">
+        <div>
+          <h1 id="pageTitle">Gym Owner Command Center</h1>
+          <p id="pageSubtitle" class="text-muted">Real-time synchronization across n8n Workflows, Google Sheets,
+            Razorpay Webhooks & WhatsApp Cloud API</p>
+        </div>
+        <div class="header-actions" id="ownerHeaderActions">
+          <button class="btn btn-secondary" onclick="switchTab('register')">+ Quick Register</button>
+          <button class="btn btn-primary" onclick="triggerWorkflow2Reminders()">💬 Run Morning Reminders</button>
+        </div>
+      </header>
+
+      <!-- Notification Toast Banner -->
+      <div id="toastBanner" class="toast-banner hidden"></div>
+
+      <!-- ================================================================
+           TAB 1: DASHBOARD & LIVE MEMBER DIRECTORY
+           ================================================================ -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Registered Members</div>
+            <div class="kpi-value" id="kpiTotalMembers">0</div>
+            <div class="kpi-foot">Sheet 1: Members</div>
+          </div>
+          <div class="kpi-card kpi-green">
+            <div class="kpi-label">Currently Active</div>
+            <div class="kpi-value" id="kpiActiveMembers">0</div>
+            <div class="kpi-foot">Expiry_Date &ge; Today</div>
+          </div>
+          <div class="kpi-card kpi-amber">
+            <div class="kpi-label">Expiring Today / In 3 Days</div>
+            <div class="kpi-value"><span id="kpiExpiringToday">0</span> / <span id="kpiExpiring3Days">0</span></div>
+            <div class="kpi-foot">Triggered at 08:00 AM IST</div>
+          </div>
+          <div class="kpi-card kpi-red">
+            <div class="kpi-label">Expired Memberships</div>
+            <div class="kpi-value" id="kpiExpiredMembers">0</div>
+            <div class="kpi-foot">Needs Renewal Follow-up</div>
+          </div>
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-label">Revenue Collected Today</div>
+            <div class="kpi-value" id="kpiRevenueToday">₹0</div>
+            <div class="kpi-foot"><span id="kpiPaymentsToday">0</span> payment(s) today</div>
+          </div>
+          <div class="kpi-card kpi-orange">
+            <div class="kpi-label">Pending Payments</div>
+            <div class="kpi-value" id="kpiPendingPayments">0</div>
+            <div class="kpi-foot">Awaiting Cash/UPI/Razorpay</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Registered Gym Members Directory</h2>
+              <p class="text-muted">Live view of <code>Sheet 1: Members</code> with 1-click renewal and payment actions
+              </p>
+            </div>
+            <div class="filter-bar">
+              <input type="text" id="memberSearchInput" placeholder="Search name, ID, or phone..." class="input-sm" />
+              <select id="memberStatusFilter" class="input-sm">
+                <option value="ALL">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Expiring Soon">Expiring in 3 Days</option>
+                <option value="Expiring Today">Expiring Today</option>
+                <option value="Expired">Expired</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Member_ID</th>
+                  <th>Name</th>
+                  <th>Phone (E.164)</th>
+                  <th>Plan</th>
+                  <th>Assigned Trainer</th>
+                  <th>Joining_Date</th>
+                  <th>Expiry_Date</th>
+                  <th>Payment</th>
+                  <th>WA Consent</th>
+                  <th>Status</th>
+                  <th>Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardMembersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 2: WORKFLOW 1 — NEW MEMBER REGISTRATION
+           ================================================================ -->
+      <section id="tab-register" class="tab-panel">
+        <div class="workflow-pipeline">
+          <span class="pipe-step">1. Form Trigger</span> &rarr;
+          <span class="pipe-step">2. Validate Input</span> &rarr;
+          <span class="pipe-step">3. Normalize Indian Phone</span> &rarr;
+          <span class="pipe-step">4. Check Duplicate</span> &rarr;
+          <span class="pipe-step">5. Calculate Month-End Safe Expiry</span> &rarr;
+          <span class="pipe-step">6. Add to Google Sheets</span> &rarr;
+          <span class="pipe-step">7. Send Welcome WhatsApp</span>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>New Member Registration Form</h2>
+              <p class="text-muted">Triggers <strong>n8n Workflow 1</strong>
+                (<code>POST /api/workflows/1/register</code>)</p>
+            </div>
+            <form id="registrationForm" class="form-grid">
+              <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="regName" required placeholder="e.g. Siddharth Malhotra" />
+              </div>
+              <div class="form-group">
+                <label>Indian Mobile Number * (10 digits or +91)</label>
+                <input type="text" id="regPhone" required placeholder="e.g. 9876543220 or +91 98765 43220" />
+                <small class="form-hint">Auto-normalized to <code>91XXXXXXXXXX</code> &amp; checked for
+                  duplicates</small>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="siddharth@example.in" />
+              </div>
+              <div class="form-group">
+                <label>Membership Plan *</label>
+                <select id="regPlan">
+                  <option value="Monthly" data-months="1">1 Month — Monthly Plan (₹2,000)</option>
+                  <option value="Quarterly" data-months="3">3 Months — Quarterly Plan (₹4,000)</option>
+                  <option value="Half-Yearly" data-months="6">6 Months — Half-Yearly Plan (₹6,000)</option>
+                  <option value="Yearly" data-months="12">1 Year — Yearly Plan (₹9,000)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Joining Date (YYYY-MM-DD) *</label>
+                <input type="date" id="regJoiningDate" required />
+                <small class="form-hint">Try <code>2026-01-31</code> + 1 Month &rarr; clamps accurately to
+                  <code>2026-02-28</code></small>
+              </div>
+              <div class="form-group">
+                <label>Calculated Expiry Date (Auto Preview)</label>
+                <input type="text" id="regExpiryPreview" readonly class="readonly-input" />
+              </div>
+              <div class="form-group">
+                <label>Payment Status *</label>
+                <select id="regPaymentStatus">
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Payment Method *</label>
+                <select id="regPaymentMethod">
+                  <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Razorpay">Razorpay Online Link</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="regWhatsappConsent" checked />
+                  <span><strong>WhatsApp Notification Consent:</strong> Member agrees to receive automated membership
+                    welcome, receipt, and renewal reminders via WhatsApp Business Cloud API.</span>
+                </label>
+              </div>
+              <div class="form-actions full-width">
+                <button type="submit" class="btn btn-primary">🚀 Execute Workflow 1: Register Member</button>
+                <button type="button" class="btn btn-outline" onclick="fillJan31Test()">🧪 Test Jan 31 Month-End
+                  Clamping</button>
+                <button type="button" class="btn btn-outline" onclick="fillDuplicatePhoneTest()">🛑 Test Duplicate Phone
+                  Guard</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Workflow 1 Node Execution Trace</h2>
+              <p class="text-muted">Live step-by-step n8n node output &amp; WhatsApp payload preview</p>
+            </div>
+            <div id="wf1TraceOutput" class="trace-box">
+              <div class="empty-trace">Submit the registration form or click a test button to inspect every n8n node
+                execution step.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 3: WORKFLOW 2 — AUTOMATED MEMBERSHIP EXPIRY REMINDERS
+           ================================================================ -->
+      <section id="tab-reminders" class="tab-panel">
+        <div class="workflow-pipeline">
+          <span class="pipe-step">1. Schedule Trigger (08:00 IST)</span> &rarr;
+          <span class="pipe-step">2. Read Members</span> &rarr;
+          <span class="pipe-step">3. Calculate Remaining Days</span> &rarr;
+          <span class="pipe-step">4. Filter (3 Days &amp; Today)</span> &rarr;
+          <span class="pipe-step">5. Check Consent &amp; Reminder_Logs</span> &rarr;
+          <span class="pipe-step">6. Send WhatsApp Template</span> &rarr;
+          <span class="pipe-step">7. Save Reminder Log</span>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Morning Expiry Reminder Engine</h2>
+                <p class="text-muted">Identifies memberships expiring in <strong>3 days</strong> or
+                  <strong>today</strong>, enforces consent &amp; same-day deduplication
+                </p>
+              </div>
+              <button class="btn btn-primary" onclick="triggerWorkflow2Reminders()">▶ Run Workflow 2 Now</button>
+            </div>
+
+            <div class="template-preview-grid">
+              <div class="wa-template-card">
+                <div class="wa-badge">Approved Template: <code>gym_expiry_3day_reminder</code></div>
+                <p class="wa-bubble">"Hello <strong>{{name}}</strong>, your gym membership expires in 3 days. Please
+                  renew your membership to continue enjoying our facilities. Thank you!"</p>
+              </div>
+              <div class="wa-template-card">
+                <div class="wa-badge">Approved Template: <code>gym_expiry_today_reminder</code></div>
+                <p class="wa-bubble">"Hello <strong>{{name}}</strong>, your gym membership expires today. Please renew
+                  your plan to continue your fitness journey!"</p>
+              </div>
+            </div>
+
+            <h3 style="margin:18px 0 10px;font-size:15px;">Reminder_Logs (Sheet 3 Audit History)</h3>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Reminder_ID</th>
+                    <th>Member_ID</th>
+                    <th>Phone</th>
+                    <th>Reminder_Type</th>
+                    <th>Sent_Date</th>
+                    <th>Delivery_Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reminderLogsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Workflow 2 Execution Result &amp; Idempotency Check</h2>
+              <p class="text-muted">Click "Run Workflow 2 Now" twice in a row to verify duplicate reminders are blocked
+                on the same day</p>
+            </div>
+            <div id="wf2TraceOutput" class="trace-box">
+              <div class="empty-trace">Click "Run Workflow 2 Now" to scan all members and dispatch WhatsApp renewal
+                reminders.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 4: WORKFLOW 3 — PAYMENT MANAGEMENT (RAZORPAY + MANUAL CASH/UPI)
+           ================================================================ -->
+      <section id="tab-payments" class="tab-panel">
+        <div class="workflow-pipeline">
+          <span class="pipe-step">1. Razorpay Webhook / Manual Form</span> &rarr;
+          <span class="pipe-step">2. Verify HMAC-SHA256 Signature</span> &rarr;
+          <span class="pipe-step">3. Check Duplicate Reference</span> &rarr;
+          <span class="pipe-step">4. Find Member</span> &rarr;
+          <span class="pipe-step">5. Update Payment Status</span> &rarr;
+          <span class="pipe-step">6. Extend Membership Expiry</span> &rarr;
+          <span class="pipe-step">7. Save Transaction History</span> &rarr;
+          <span class="pipe-step">8. Notify Member</span>
+        </div>
+
+        <div class="two-col-grid">
+          <!-- Column 1: Manual Cash / UPI Form + Razorpay Webhook Simulator -->
+          <div class="card">
+            <div class="card-header">
+              <h2>A. Manual Payment Update (Cash / UPI)</h2>
+              <p class="text-muted">For gym owners collecting Cash or UPI at the front desk</p>
+            </div>
+            <form id="manualPaymentForm" class="form-grid">
+              <div class="form-group">
+                <label>Select Member *</label>
+                <select id="payMemberSelect" required></select>
+              </div>
+              <div class="form-group">
+                <label>Renewal Plan *</label>
+                <select id="payPlanSelect">
+                  <option value="Monthly" data-months="1">1 Month — Monthly (₹2,000)</option>
+                  <option value="Quarterly" data-months="3">3 Months — Quarterly (₹4,000)</option>
+                  <option value="Half-Yearly" data-months="6">6 Months — Half-Yearly (₹6,000)</option>
+                  <option value="Yearly" data-months="12">1 Year — Yearly (₹9,000)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Amount (₹) *</label>
+                <input type="number" id="payAmountInput" required value="2000" />
+              </div>
+              <div class="form-group">
+                <label>Payment Method *</label>
+                <select id="payMethodSelect">
+                  <option value="UPI">UPI (GPay / PhonePe)</option>
+                  <option value="Cash">Cash</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label>Unique Payment Reference / UPI UTR / Receipt No. *</label>
+                <input type="text" id="payReferenceInput" required placeholder="e.g. UPI-UTR-41259874125" />
+                <small class="form-hint">Enforces strict idempotency: submitting the same reference twice will be
+                  blocked</small>
+              </div>
+              <div class="form-actions full-width">
+                <button type="submit" class="btn btn-primary">💳 Record Payment &amp; Extend Expiry</button>
+              </div>
+            </form>
+
+            <hr class="divider" />
+
+            <div class="card-header" style="padding-top:4px;">
+              <h2>B. Razorpay Payment Link &amp; HMAC-SHA256 Webhook Simulator</h2>
+              <p class="text-muted">Never marks payment paid on browser redirect — verifies raw body HMAC-SHA256
+                signature</p>
+            </div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <button type="button" class="btn btn-secondary" onclick="generateAndFireRazorpayWebhook(true)">
+                  🔐 1. Generate Payment Link &amp; Fire Valid Signed Razorpay Webhook
+                </button>
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-outline" onclick="generateAndFireRazorpayWebhook(false)">
+                  🛡️ 2. Test Tampered / Invalid Signature (Expect 401 Reject)
+                </button>
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-outline" onclick="replayLastRazorpayWebhook()">
+                  🔁 3. Replay Same Webhook Reference (Expect 409 Idempotent Skip)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Trace & Payments Table -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Workflow 3 Security &amp; Execution Trace</h2>
+              <p class="text-muted">Displays HMAC-SHA256 verification, expiry extension &amp; idempotency checks</p>
+            </div>
+            <div id="wf3TraceOutput" class="trace-box" style="max-height:280px;">
+              <div class="empty-trace">Process a manual Cash/UPI payment or fire a signed Razorpay webhook to view the
+                trace.</div>
+            </div>
+
+            <h3 style="margin:18px 0 10px;font-size:15px;">Sheet 2: Payments Transaction History</h3>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Payment_ID</th>
+                    <th>Member_ID</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Razorpay_Reference</th>
+                    <th>Processed</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 5: WORKFLOW 4 — DAILY GYM REPORT
+           ================================================================ -->
+      <section id="tab-report" class="tab-panel">
+        <div class="workflow-pipeline">
+          <span class="pipe-step">1. Schedule Trigger (08:30 IST)</span> &rarr;
+          <span class="pipe-step">2. Read Members</span> &rarr;
+          <span class="pipe-step">3. Read Payments</span> &rarr;
+          <span class="pipe-step">4. Calculate 8 Core KPIs</span> &rarr;
+          <span class="pipe-step">5. Generate Clean HTML Report</span> &rarr;
+          <span class="pipe-step">6. Send Email to Gym Owner (Gmail)</span>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Automated Morning Email Report Preview</h2>
+                <p class="text-muted">Exact HTML email dispatched via Gmail node to <code
+                    id="reportOwnerEmailBadge">owner@ironfitgym.in</code></p>
+              </div>
+              <button class="btn btn-primary" onclick="triggerWorkflow4Report()">📧 Generate &amp; Send Daily
+                Report</button>
+            </div>
+            <div id="htmlReportPreviewContainer" class="email-preview-frame"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Calculated Statistics JSON &amp; Node Trace</h2>
+              <p class="text-muted">Output from Workflow 4 Code Node</p>
+            </div>
+            <div id="wf4TraceOutput" class="trace-box"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 6: GOOGLE SHEETS DATABASE (ALL 4 TABS + CSV DOWNLOAD)
+           ================================================================ -->
+      <section id="tab-sheets" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Google Sheets 4-Tab Database Structure</h2>
+              <p class="text-muted">Inspect live rows or download ready-to-import CSV templates for your Google Sheet
+              </p>
+            </div>
+            <div class="sheet-tabs-bar">
+              <button class="btn btn-sm btn-primary" onclick="renderSheetInspector('Members')">Sheet 1: Members</button>
+              <button class="btn btn-sm btn-secondary" onclick="renderSheetInspector('Payments')">Sheet 2:
+                Payments</button>
+              <button class="btn btn-sm btn-secondary" onclick="renderSheetInspector('Reminder_Logs')">Sheet 3:
+                Reminder_Logs</button>
+              <button class="btn btn-sm btn-secondary" onclick="renderSheetInspector('Gym_Settings')">Sheet 4:
+                Gym_Settings</button>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h3 id="activeSheetTitle" style="margin:0;">Sheet 1: Members</h3>
+            <a id="downloadSheetCsvLink" href="/api/sheets/csv/Members.csv" class="btn btn-outline btn-sm" download>
+              ⬇ Download This Sheet as CSV
+            </a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="sheetInspectorTable">
+              <thead id="sheetInspectorHead"></thead>
+              <tbody id="sheetInspectorBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 6B: MONGODB ATLAS CLOUD DATABASE & TWO-WAY SYNC
+           ================================================================ -->
+      <section id="tab-mongodb" class="tab-panel">
+        <div class="workflow-pipeline">
+          <span class="pipe-step">1. MongoDB Atlas SRV Connection</span> &rarr;
+          <span class="pipe-step">2. Auto-Index Collections (Unique Member_ID &amp; Phone)</span> &rarr;
+          <span class="pipe-step">3. Real-Time Write-Through on Every n8n Workflow</span> &rarr;
+          <span class="pipe-step">4. Two-Way Push / Pull Sync with Google Sheets CSVs</span>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>🍃 Connect to MongoDB Atlas Cluster</h2>
+                <p class="text-muted">Paste your MongoDB Atlas connection string (<code>mongodb+srv://...</code>) to
+                  enable real-time cloud persistence</p>
+              </div>
+              <span id="mongoPanelBadge" class="badge badge-active">Connected to Atlas Cloud</span>
+            </div>
+
+            <form id="mongoConnectForm" class="form-grid">
+              <div class="form-group full-width">
+                <label>MongoDB Atlas Connection URI (<code>MONGODB_URI</code>) *</label>
+                <input type="text" id="mongoUriInput" required
+                  placeholder="mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority" />
+                <small class="form-hint">In MongoDB Atlas: go to <strong>Database &rarr; Connect &rarr; Drivers
+                    (Node.js)</strong> and copy your connection string.</small>
+              </div>
+              <div class="form-group full-width">
+                <label>Database Name (<code>MONGODB_DB_NAME</code>) *</label>
+                <input type="text" id="mongoDbNameInput" required value="gym_manager_saas"
+                  placeholder="gym_manager_saas" />
+              </div>
+              <div class="form-actions full-width">
+                <button type="submit" class="btn btn-primary">🍃 Connect &amp; Sync to MongoDB Atlas</button>
+                <button type="button" class="btn btn-secondary" onclick="triggerMongoManualSync('PUSH')">
+                  ⬆ Push All Local Data to Atlas
+                </button>
+                <button type="button" class="btn btn-outline" onclick="triggerMongoManualSync('PULL')">
+                  ⬇ Pull Cloud Data from Atlas
+                </button>
+                <button type="button" class="btn btn-outline" onclick="disconnectMongoCluster()">
+                  🔌 Disconnect
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Atlas Cluster Status &amp; Cloud Collection Counts</h2>
+              <p class="text-muted">Every registration, payment webhook, reminder, and trainer update automatically
+                writes through to these 7 Atlas collections</p>
+            </div>
+
+            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr));margin-bottom:16px;">
+              <div class="kpi-card kpi-green">
+                <div class="kpi-label">members</div>
+                <div class="kpi-value" id="mongoCountMembers">0</div>
+                <div class="kpi-foot">Unique Phone &amp; ID</div>
+              </div>
+              <div class="kpi-card kpi-blue">
+                <div class="kpi-label">payments</div>
+                <div class="kpi-value" id="mongoCountPayments">0</div>
+                <div class="kpi-foot">Razorpay / Cash / UPI</div>
+              </div>
+              <div class="kpi-card kpi-amber">
+                <div class="kpi-label">reminder_logs</div>
+                <div class="kpi-value" id="mongoCountReminders">0</div>
+                <div class="kpi-foot">WhatsApp Audit</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">trainers</div>
+                <div class="kpi-value" id="mongoCountTrainers">0</div>
+                <div class="kpi-foot">Coach Accounts</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">member_profiles</div>
+                <div class="kpi-value" id="mongoCountProfiles">0</div>
+                <div class="kpi-foot">Workout &amp; Diet Plans</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">gym_settings</div>
+                <div class="kpi-value" id="mongoCountSettings">0</div>
+                <div class="kpi-foot">Tenant Config</div>
+              </div>
+            </div>
+
+            <div id="mongoStatusTrace" class="trace-box" style="max-height:210px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 7: N8N WORKFLOW EXPORTS & EXECUTION AUDIT LOGS
+           ================================================================ -->
+      <section id="tab-n8n" class="tab-panel">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <div>
+              <h2>Importable n8n Workflow JSON Files</h2>
+              <p class="text-muted">Import directly into your n8n instance via <strong>Workflows &rarr; Import from
+                  File</strong></p>
+            </div>
+          </div>
+          <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-bottom:0;">
+            <div class="kpi-card">
+              <div class="kpi-label">Workflow 1</div>
+              <div style="font-weight:700;margin:6px 0;">New Member Registration</div>
+              <p class="text-muted" style="font-size:12px;margin-bottom:12px;">Webhook &rarr; Validate &amp; Normalize
+                &rarr; Duplicate Check &rarr; Month-End Safe Expiry &rarr; Sheets &rarr; WhatsApp</p>
+              <a href="/api/n8n-workflows/workflow-1-member-registration.json" download class="btn btn-outline btn-sm">⬇
+                Download WF1 JSON</a>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Workflow 2</div>
+              <div style="font-weight:700;margin:6px 0;">Membership Expiry Reminder</div>
+              <p class="text-muted" style="font-size:12px;margin-bottom:12px;">08:00 IST Cron &rarr; Read Members &rarr;
+                Filter 3d &amp; 0d &rarr; Check Consent &amp; Logs &rarr; WhatsApp Template</p>
+              <a href="/api/n8n-workflows/workflow-2-expiry-reminders.json" download class="btn btn-outline btn-sm">⬇
+                Download WF2 JSON</a>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Workflow 3</div>
+              <div style="font-weight:700;margin:6px 0;">Payment Processing</div>
+              <p class="text-muted" style="font-size:12px;margin-bottom:12px;">Razorpay Webhook / Manual &rarr;
+                HMAC-SHA256 Verify &rarr; Idempotency Guard &rarr; Extend Expiry &rarr; Receipt</p>
+              <a href="/api/n8n-workflows/workflow-3-payment-processing.json" download class="btn btn-outline btn-sm">⬇
+                Download WF3 JSON</a>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Workflow 4</div>
+              <div style="font-weight:700;margin:6px 0;">Daily Gym Report</div>
+              <p class="text-muted" style="font-size:12px;margin-bottom:12px;">08:30 IST Cron &rarr; Read Members &amp;
+                Payments &rarr; Compute 8 KPIs &rarr; HTML Email &rarr; Gmail Owner</p>
+              <a href="/api/n8n-workflows/workflow-4-daily-report.json" download class="btn btn-outline btn-sm">⬇
+                Download WF4 JSON</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>System Audit Trail &amp; Workflow Execution Logs</h2>
+            <p class="text-muted">Every registration, reminder, webhook verification, and report execution is logged
+              here</p>
+          </div>
+          <div id="auditLogsContainer" class="trace-box" style="max-height:420px;"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TAB 8: GYM_SETTINGS & COMMERCIAL SAAS BUSINESS MODEL
+           ================================================================ -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Sheet 4: Gym_Settings Configuration</h2>
+              <p class="text-muted">Multi-tenant per-gym configuration stored in Google Sheets</p>
+            </div>
+            <form id="settingsForm" class="form-grid">
+              <div class="form-group full-width">
+                <label>Gym Name</label>
+                <input type="text" id="setGymName" required />
+              </div>
+              <div class="form-group">
+                <label>Owner Email (For Daily Reports)</label>
+                <input type="email" id="setOwnerEmail" required />
+              </div>
+              <div class="form-group">
+                <label>Gym WhatsApp Business Number</label>
+                <input type="text" id="setWhatsappNumber" required />
+              </div>
+              <div class="form-group">
+                <label>1 Month — Monthly Plan Price (₹)</label>
+                <input type="number" id="setMonthlyPrice" required />
+              </div>
+              <div class="form-group">
+                <label>3 Months — Quarterly Plan Price (₹)</label>
+                <input type="number" id="setQuarterlyPrice" required />
+              </div>
+              <div class="form-group">
+                <label>6 Months — Half-Yearly Plan Price (₹)</label>
+                <input type="number" id="setHalfYearlyPrice" required />
+              </div>
+              <div class="form-group">
+                <label>1 Year — Yearly Plan Price (₹)</label>
+                <input type="number" id="setYearlyPrice" required />
+              </div>
+              <div class="form-group">
+                <label>Daily Reminder Time (IST)</label>
+                <input type="text" id="setReminderTime" required placeholder="08:00" />
+              </div>
+              <div class="form-actions full-width">
+                <button type="submit" class="btn btn-primary">💾 Save Gym_Settings to Sheet 4</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Commercial SaaS Packaging &amp; Unit Economics</h2>
+              <p class="text-muted">Reusable multi-gym deployment blueprint for local fitness centers</p>
+            </div>
+            <div class="saas-pricing-box">
+              <div class="pricing-tier">
+                <div class="tier-badge">One-Time Client Setup Fee</div>
+                <div class="tier-price">₹10,000 – ₹15,000 <span style="font-size:13px;font-weight:400;">/ gym (Example
+                    Initial Setup Fee)</span></div>
+                <ul class="tier-list">
+                  <li>Dedicated Google Sheet 4-Tab Database cloned on Gym's Google Account</li>
+                  <li>Meta WhatsApp Business Cloud API configuration &amp; 4 Template approvals</li>
+                  <li>Razorpay Webhook &amp; HMAC-SHA256 secret configuration</li>
+                  <li>4 Production n8n Workflows + Staff Training &amp; Handover</li>
+                </ul>
+              </div>
+              <div class="pricing-tier" style="margin-top:14px;">
+                <div class="tier-badge">Optional Monthly AMC / Retainer</div>
+                <div class="tier-price">₹1,500 – ₹2,500 <span style="font-size:13px;font-weight:400;">/ month</span>
+                </div>
+                <ul class="tier-list">
+                  <li>Managed n8n VPS hosting, uptime monitoring &amp; error alerts</li>
+                  <li>Monthly Google Sheets backup &amp; template adjustments</li>
+                  <li>Estimated Monthly Infrastructure Cost per Gym: ~₹400 – ₹850/month (VPS share + Meta Utility
+                    conversations)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TRAINER & MEMBER DEDICATED ROLE PORTALS
+           ================================================================ -->
+      <section id="tab-portal-login" class="tab-panel">
+        <!-- ==============================================================
+             ACTIVE TRAINER PORTAL VIEW
+             ============================================================== -->
+        <div id="trainerPortalView" class="card hidden" style="margin-bottom:22px;border-color:rgba(16,185,129,0.45);">
+          <div class="card-header">
+            <div>
+              <h2 id="trainerPortalHeading">🏋️‍♂️ Trainer Dashboard</h2>
+              <p class="text-muted" id="trainerPortalSubheading">Assigned trainees, workout &amp; nutrition assignments,
+                and attendance check-in</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select id="trainerFilterSelect" class="input-sm" onchange="renderTrainerPortal()">
+                <option value="ASSIGNED">My Assigned Members Only</option>
+                <option value="ALL">All Gym Members</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="kpi-grid" style="margin-bottom:18px;">
+            <div class="kpi-card kpi-green">
+              <div class="kpi-label">Assigned Trainees</div>
+              <div class="kpi-value" id="trnKpiAssigned">0</div>
+              <div class="kpi-foot">Active coaching roster</div>
+            </div>
+            <div class="kpi-card kpi-amber">
+              <div class="kpi-label">Trainees Expiring Soon</div>
+              <div class="kpi-value" id="trnKpiExpiring">0</div>
+              <div class="kpi-foot">Remind during session</div>
+            </div>
+            <div class="kpi-card kpi-blue">
+              <div class="kpi-label">Total Check-Ins Logged</div>
+              <div class="kpi-value" id="trnKpiCheckins">0</div>
+              <div class="kpi-foot">Across assigned members</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Plan &amp; Status</th>
+                    <th>Workout &amp; Diet Summary</th>
+                    <th>Check-Ins</th>
+                    <th>Trainer Action</th>
+                  </tr>
+                </thead>
+                <tbody id="trainerRosterTableBody"></tbody>
+              </table>
+            </div>
+
+            <div class="card" style="background:#0f172a;">
+              <div class="card-header">
+                <h3>📝 Assign Workout Plan &amp; Diet Notes</h3>
+              </div>
+              <form id="trainerUpdatePlanForm" class="form-grid">
+                <div class="form-group">
+                  <label>Select Member</label>
+                  <select id="trnEditMemberSelect" required onchange="populateTrainerEditorForMember()"></select>
+                </div>
+                <div class="form-group">
+                  <label>Assigned Coach</label>
+                  <select id="trnEditCoachSelect">
+                    <option value="TRN-201">TRN-201 — Coach Rajesh Kumar</option>
+                    <option value="TRN-202">TRN-202 — Coach Neha Kapoor</option>
+                  </select>
+                </div>
+                <div class="form-group full-width">
+                  <label>Workout Program / Weekly Split</label>
+                  <input type="text" id="trnEditWorkoutInput" required
+                    placeholder="e.g. 5-Day Push / Pull / Legs Hypertrophy" />
+                </div>
+                <div class="form-group full-width">
+                  <label>Nutrition &amp; Diet Guidelines</label>
+                  <input type="text" id="trnEditDietInput" required
+                    placeholder="e.g. 2,200 kcal • 140g Protein • 3L Water" />
+                </div>
+                <div class="form-actions full-width">
+                  <button type="submit" class="btn btn-primary">💾 Save Workout &amp; Diet Plan</button>
+                  <button type="button" class="btn btn-secondary" onclick="markMemberAttendanceFromTrainer()">
+                    ✅ +1 Mark Today's Check-In
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==============================================================
+             ACTIVE MEMBER SELF-SERVICE PORTAL VIEW
+             ============================================================== -->
+        <div id="memberPortalView" class="card hidden" style="border-color:rgba(59,130,246,0.45);">
+          <div class="card-header">
+            <div>
+              <h2 id="memberPortalHeading">🏃‍♂️ Member Self-Service Portal</h2>
+            </div>
+          </div>
+
+          <div class="kpi-grid" style="margin-bottom:18px;">
+            <div class="kpi-card">
+              <div class="kpi-label">Membership ID &amp; Plan</div>
+              <div class="kpi-value" id="memKpiIdPlan" style="font-size:20px;">--</div>
+              <div class="kpi-foot" id="memKpiJoined">Joined: --</div>
+            </div>
+            <div class="kpi-card kpi-green">
+              <div class="kpi-label">Membership Status</div>
+              <div class="kpi-value" id="memKpiStatus" style="font-size:22px;">--</div>
+              <div class="kpi-foot" id="memKpiExpiry">Expires: --</div>
+            </div>
+            <div class="kpi-card kpi-amber">
+              <div class="kpi-label">Days Remaining</div>
+              <div class="kpi-value" id="memKpiDaysLeft">0</div>
+              <div class="kpi-foot">Asia/Kolkata IST Calendar</div>
+            </div>
+            <div class="kpi-card kpi-blue">
+              <div class="kpi-label">Gym Check-Ins</div>
+              <div class="kpi-value" id="memKpiAttendance">0</div>
+              <div class="kpi-foot" id="memKpiLastCheckin">Last visit: --</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="card" style="background:#0f172a;">
+              <div class="card-header">
+                <div>
+                  <h3>🏋️‍♂️ My Assigned Personal Trainer — Complete Profile</h3>
+                  <p class="text-muted">Direct coach contact, credentials, shift timings &amp; personalized training
+                    prescription</p>
+                </div>
+                <span class="badge badge-active" id="memTrainerIdBadge">TRN-201</span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:14px;font-size:13.5px;">
+                <!-- Complete Trainer Profile Card -->
+                <div class="pricing-tier" style="border-color:rgba(16,185,129,0.35);background:rgba(16,185,129,0.04);">
+                  <div
+                    style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border-color);">
+                    <div>
+                      <div class="tier-badge">Assigned Head Coach</div>
+                      <div style="font-size:19px;font-weight:700;color:#fff;margin-top:2px;" id="memTrainerName">--
+                      </div>
+                      <div style="color:#34d399;font-size:13px;font-weight:600;margin-top:2px;"
+                        id="memTrainerSpecialty">--</div>
+                    </div>
+                    <div style="text-align:right;">
+                      <span class="badge badge-expiring" id="memTrainerRating">4.9 ★</span>
+                      <div class="text-muted" style="font-size:11.5px;margin-top:4px;" id="memTrainerExperience">
+                        Experience: --</div>
+                    </div>
+                  </div>
+
+                  <!-- Trainer Complete Details Grid -->
+                  <div class="form-grid" style="gap:10px;margin-bottom:12px;">
+                    <div
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">📞 Direct Phone /
+                        WhatsApp</div>
+                      <div style="font-weight:600;color:#f8fafc;margin-top:2px;" id="memTrainerPhone">--</div>
+                    </div>
+                    <div
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">📧 Official Email</div>
+                      <div style="font-weight:600;color:#f8fafc;margin-top:2px;" id="memTrainerEmail">--</div>
+                    </div>
+                    <div
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">🕒 Gym Shift Timings
+                      </div>
+                      <div style="font-weight:600;color:#38bdf8;margin-top:2px;" id="memTrainerShift">--</div>
+                    </div>
+                    <div
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">📍 Floor Consultation
+                        Slot</div>
+                      <div style="font-weight:600;color:#fbbf24;margin-top:2px;" id="memTrainerSlot">--</div>
+                    </div>
+                    <div class="full-width"
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">🏅 Certifications &amp;
+                        Academic Qualification</div>
+                      <div style="font-weight:600;color:#f8fafc;margin-top:2px;" id="memTrainerCerts">--</div>
+                      <div class="text-muted" style="font-size:12px;margin-top:2px;" id="memTrainerQualification">--
+                      </div>
+                    </div>
+                    <div class="full-width"
+                      style="background:#0b1120;padding:9px 12px;border-radius:8px;border:1px solid var(--border-color);">
+                      <div class="text-muted" style="font-size:11px;text-transform:uppercase;">🗣️ Languages &amp;
+                        Coaching Bio</div>
+                      <div style="font-size:12.5px;color:#cbd5e1;margin-top:2px;" id="memTrainerBio">--</div>
+                      <div style="font-size:11.5px;color:#93c5fd;margin-top:4px;" id="memTrainerLanguages">Languages: --
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <a id="memTrainerWhatsappBtn" href="#" target="_blank" class="btn btn-primary btn-sm">
+                      💬 Message Coach on WhatsApp
+                    </a>
+                    <a id="memTrainerEmailBtn" href="#" class="btn btn-outline btn-sm">
+                      ✉️ Email Coach
+                    </a>
+                  </div>
+                </div>
+
+                <div class="pricing-tier">
+                  <div class="tier-badge">Current Workout Split (Assigned by Coach)</div>
+                  <div style="margin-top:4px;color:#f8fafc;font-weight:600;" id="memWorkoutPlan">--</div>
+                </div>
+                <div class="pricing-tier">
+                  <div class="tier-badge">Nutrition &amp; Diet Prescription</div>
+                  <div style="margin-top:4px;color:#34d399;font-weight:600;" id="memDietNotes">--</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="background:#0f172a;">
+              <div class="card-header">
+                <div>
+                  <h3>💳 My Payment Receipts &amp; Instant Renewal</h3>
+                  <p class="text-muted">Pay online via Razorpay Webhook or check past receipts</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="memInstantRenewBtn">⚡ Instant Online Renewal</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Payment_ID</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                      <th>Reference</th>
+                    </tr>
+                  </thead>
+                  <tbody id="memberPaymentsHistoryBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+
+</html>

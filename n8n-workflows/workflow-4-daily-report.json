@@ -1,0 +1,137 @@
+{
+  "name": "Workflow 4 - Daily Gym Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "wf4-node-1-schedule",
+      "name": "1. Schedule Trigger (08:30 AM IST)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "wf4-node-2-read-members",
+      "name": "2. Read Members (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 220]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_SPREADSHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Payments",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "wf4-node-3-read-payments",
+      "name": "3. Read Payments (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [680, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node 4: Calculate All 8 Daily Gym KPIs & Generate Executive HTML Email Report\nconst members = $('2. Read Members (Google Sheets)').all().map(i => i.json);\nconst payments = $('3. Read Payments (Google Sheets)').all().map(i => i.json);\n\nconst todayIST = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'Asia/Kolkata',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit'\n}).format(new Date());\nconst [y1, m1, d1] = todayIST.split('-').map(Number);\nconst utcToday = Date.UTC(y1, m1 - 1, d1);\n\nlet totalRegistered = members.length;\nlet currentlyActive = 0;\nlet expiredMemberships = 0;\nlet expiringToday = 0;\nlet expiringIn3Days = 0;\nlet pendingPayments = 0;\n\nfor (const m of members) {\n  if (m.Payment_Status === 'Pending') pendingPayments++;\n  if (!m.Expiry_Date) continue;\n  const [y2, m2, d2] = m.Expiry_Date.split('-').map(Number);\n  const diff = Math.round((Date.UTC(y2, m2 - 1, d2) - utcToday) / (1000 * 60 * 60 * 24));\n  if (diff >= 0) currentlyActive++;\n  else expiredMemberships++;\n  if (diff === 0) expiringToday++;\n  if (diff === 3) expiringIn3Days++;\n}\n\nconst todayPaidPayments = payments.filter(p => p.Payment_Date === todayIST && p.Payment_Status === 'Paid');\nconst paymentsReceivedToday = todayPaidPayments.length;\nconst totalRevenueToday = todayPaidPayments.reduce((acc, p) => acc + Number(p.Amount || 0), 0);\n\nconst htmlReport = `<h2>Daily Gym Summary (${todayIST})</h2>\n<ul>\n  <li><strong>Total Registered Members:</strong> ${totalRegistered}</li>\n  <li><strong>Currently Active Members:</strong> ${currentlyActive}</li>\n  <li><strong>Expired Memberships:</strong> ${expiredMemberships}</li>\n  <li><strong>Memberships Expiring Today:</strong> ${expiringToday}</li>\n  <li><strong>Memberships Expiring in 3 Days:</strong> ${expiringIn3Days}</li>\n  <li><strong>Pending Payments:</strong> ${pendingPayments}</li>\n  <li><strong>Payments Received Today:</strong> ${paymentsReceivedToday}</li>\n  <li><strong>Total Revenue Collected Today:</strong> ₹${totalRevenueToday.toLocaleString('en-IN')}</li>\n</ul>`;\n\nreturn [{\n  json: {\n    todayIST,\n    totalRegistered,\n    currentlyActive,\n    expiredMemberships,\n    expiringToday,\n    expiringIn3Days,\n    pendingPayments,\n    paymentsReceivedToday,\n    totalRevenueToday,\n    htmlReport\n  }\n}];"
+      },
+      "id": "wf4-node-4-stats-html",
+      "name": "4. Calculate Statistics & Generate HTML Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 220]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.GMAIL_OWNER_EMAIL }}",
+        "subject": "=[Daily Gym Report] {{ $json.todayIST }} — Revenue Today: ₹{{ $json.totalRevenueToday }}",
+        "message": "={{ $json.htmlReport }}",
+        "options": {}
+      },
+      "id": "wf4-node-5-send-email",
+      "name": "5. Send Email Report to Gym Owner (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1220, 220]
+    }
+  ],
+  "connections": {
+    "1. Schedule Trigger (08:30 AM IST)": {
+      "main": [
+        [
+          {
+            "node": "2. Read Members (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Read Members (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "3. Read Payments (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Read Payments (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "4. Calculate Statistics & Generate HTML Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Calculate Statistics & Generate HTML Report": {
+      "main": [
+        [
+          {
+            "node": "5. Send Email Report to Gym Owner (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Asia/Kolkata",
+    "executionOrder": "v1"
+  }
+}
